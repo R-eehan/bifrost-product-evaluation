@@ -1,0 +1,121 @@
+{
+  "test": "mcp_gateway_assessment",
+  "timestamp": "2026-03-20T00:44:41",
+  "config_discovery": {
+    "/api/v1/mcp/clients": {
+      "status": "ERROR",
+      "error": "Expecting value: line 1 column 1 (char 0)"
+    },
+    "/api/v1/mcp/tools": {
+      "status": "ERROR",
+      "error": "Expecting value: line 1 column 1 (char 0)"
+    },
+    "/api/v1/mcp/settings": {
+      "status": "ERROR",
+      "error": "Expecting value: line 1 column 1 (char 0)"
+    }
+  },
+  "mcp_tool_logs": {
+    "status": "NO_MCP_LOGS",
+    "total_mcp_logs": 0,
+    "tool_calls_in_llm_logs": 0,
+    "observation": "Tool calls captured in LLM logs but not in dedicated MCP log table. This suggests the Claude Code session's tool calls were proxied but not routed through Bifrost's MCP gateway pipeline."
+  },
+  "feature_boundary": {
+    "features": [
+      {
+        "name": "MCP Catalog (add servers)",
+        "tier": "Free",
+        "accessible": true,
+        "evidence": "Visible in Web UI sidebar under MCP Gateway"
+      },
+      {
+        "name": "MCP Tool Logs",
+        "tier": "Free",
+        "accessible": true,
+        "evidence": "mcp_tool_logs table exists in logs.db"
+      },
+      {
+        "name": "MCP Settings",
+        "tier": "Free",
+        "accessible": true,
+        "evidence": "Visible in Web UI sidebar"
+      },
+      {
+        "name": "Tool Groups (RBAC)",
+        "tier": "Enterprise",
+        "accessible": false,
+        "evidence": "Behind 'Unlock users & user governance' paywall"
+      },
+      {
+        "name": "Auth Config (tool-level)",
+        "tier": "Enterprise",
+        "accessible": false,
+        "evidence": "Behind enterprise paywall in Web UI"
+      },
+      {
+        "name": "Virtual Key \u2192 Tool mapping",
+        "tier": "Enterprise",
+        "accessible": false,
+        "evidence": "Requires enterprise governance"
+      },
+      {
+        "name": "Code Mode (meta-tools)",
+        "tier": "Free",
+        "accessible": true,
+        "evidence": "Documented as OSS feature"
+      },
+      {
+        "name": "Manual/Agent/Code modes",
+        "tier": "Free",
+        "accessible": true,
+        "evidence": "Three execution modes in OSS"
+      },
+      {
+        "name": "Per-tool observability",
+        "tier": "Free",
+        "accessible": null,
+        "evidence": "Unknown \u2014 need to test with MCP server configured"
+      },
+      {
+        "name": "Tool call approval flow",
+        "tier": "Free",
+        "accessible": true,
+        "evidence": "Manual mode = LLM suggests, app approves"
+      },
+      {
+        "name": "Tool allowlisting",
+        "tier": "Free",
+        "accessible": true,
+        "evidence": "Agent mode with allowlist"
+      },
+      {
+        "name": "Federated MCP (API\u2192MCP)",
+        "tier": "Enterprise",
+        "accessible": false,
+        "evidence": "Listed as enterprise feature in research"
+      }
+    ],
+    "free_count": 8,
+    "enterprise_count": 4
+  },
+  "conversion_assessment": {
+    "observations": [
+      {
+        "signal": "POSITIVE",
+        "finding": "Free tier has 8 MCP features \u2014 enough to be genuinely useful",
+        "impact": "Developers will actually adopt the MCP gateway, not just try it"
+      },
+      {
+        "signal": "GAP",
+        "finding": "No MCP tool calls in dedicated log table despite tool_calls in LLM logs",
+        "impact": "The free MCP experience may not feel differentiated from basic proxying. If tool calls only appear in LLM logs (not a dedicated MCP view), the governance narrative doesn't start building."
+      },
+      {
+        "signal": "PRESENT_BUT_WEAK",
+        "finding": "Enterprise features show 'Book a demo' paywall in Web UI",
+        "impact": "The paywall exists but doesn't explain WHY governance matters. A developer who hasn't felt the pain of uncontrolled tool access won't be motivated to 'Book a demo'. The free tier should surface the governance gap (e.g., 'X tool calls had no authorization policy') before presenting the gate."
+      }
+    ]
+  }
+}

@@ -1,0 +1,152 @@
+{
+  "test": "observability_auto_capture",
+  "timestamp": "2026-03-20T00:44:33",
+  "trace_marker": "OBSERVABILITY_TEST_77bcae73",
+  "sdk_data": {
+    "status": "SUCCESS",
+    "prompt": "OBSERVABILITY_TEST_77bcae73: Explain observability in distributed systems in 2 sentences.",
+    "response": "Observability in distributed systems refers to the ability to understand the internal state of a system by examining its external outputs, typically through three key pillars: **logs**, **metrics**, and **traces**. These signals, when collected and correlated across services, enable engineers to diagnose complex issues, track requests as they propagate through multiple services, and proactively identify performance bottlenecks or failures without needing to reproduce problems locally.",
+    "sdk_latency_ms": 4655.9,
+    "sdk_usage": {
+      "prompt_tokens": 31,
+      "completion_tokens": 94,
+      "total_tokens": 125
+    }
+  },
+  "bifrost_log_found": true,
+  "analysis": {
+    "status": "ANALYZED",
+    "captured": 16,
+    "missing": 1,
+    "capture_rate": 94.1,
+    "details": {
+      "id": {
+        "status": "CAPTURED",
+        "value": "64ca5301-dfb9-4c39-81c9-a6a1ecd2d08c"
+      },
+      "provider": {
+        "status": "CAPTURED",
+        "value": "anthropic"
+      },
+      "model": {
+        "status": "CAPTURED",
+        "value": "claude-opus-4-6"
+      },
+      "status": {
+        "status": "CAPTURED",
+        "value": "success"
+      },
+      "latency": {
+        "status": "CAPTURED",
+        "value": "4477.0"
+      },
+      "cost": {
+        "status": "CAPTURED",
+        "value": "0.0025050000000000003"
+      },
+      "prompt_tokens": {
+        "status": "CAPTURED",
+        "value": "31"
+      },
+      "completion_tokens": {
+        "status": "CAPTURED",
+        "value": "94"
+      },
+      "total_tokens": {
+        "status": "CAPTURED",
+        "value": "125"
+      },
+      "input_history": {
+        "status": "CAPTURED",
+        "value": "CAPTURED"
+      },
+      "output_message": {
+        "status": "CAPTURED",
+        "value": "CAPTURED"
+      },
+      "tool_calls": {
+        "status": "CAPTURED",
+        "value": "N/A (no tools in request)"
+      },
+      "params": {
+        "status": "CAPTURED",
+        "value": "CAPTURED"
+      },
+      "stream": {
+        "status": "MISSING",
+        "value": null
+      },
+      "selected_key_id": {
+        "status": "CAPTURED",
+        "value": "e6a9ea84-131e-47a5-8aa8-38a655f7e72b"
+      },
+      "virtual_key_id": {
+        "status": "CAPTURED",
+        "value": "Not configured"
+      },
+      "timestamp": {
+        "status": "CAPTURED",
+        "value": "2026-03-19 19:14:27.057627+00:00"
+      }
+    }
+  },
+  "bifrost_log_fields": {
+    "id": "64ca5301-dfb9-4c39-81c9-a6a1ecd2d08c",
+    "parent_request_id": null,
+    "timestamp": "2026-03-19 19:14:27.057627+00:00",
+    "object_type": "chat_completion",
+    "provider": "anthropic",
+    "model": "claude-opus-4-6",
+    "number_of_retries": null,
+    "fallback_index": null,
+    "selected_key_id": "e6a9ea84-131e-47a5-8aa8-38a655f7e72b",
+    "selected_key_name": "bifrost-gateway-eval-key",
+    "virtual_key_id": null,
+    "virtual_key_name": null,
+    "routing_engines_used": null,
+    "routing_rule_id": null,
+    "routing_rule_name": null,
+    "input_history": "[{\"role\":\"user\",\"content\":\"OBSERVABILITY_TEST_77bcae73: Explain observability in distributed systems in 2 sentences.\"}]",
+    "responses_input_history": "[]",
+    "output_message": "{\"role\":\"assistant\",\"content\":\"Observability in distributed systems refers to the ability to understand the internal state of a system by examining its external outputs, typically through three key pi",
+    "responses_output": null,
+    "embedding_output": null,
+    "rerank_output": null,
+    "params": "{\"temperature\":0.7}",
+    "tools": null,
+    "tool_calls": null,
+    "speech_input": null,
+    "transcription_input": null,
+    "image_generation_input": null,
+    "video_generation_input": null,
+    "speech_output": null,
+    "transcription_output": null,
+    "image_generation_output": null,
+    "list_models_output": null,
+    "video_generation_output": null,
+    "video_retrieve_output": null,
+    "video_download_output": null,
+    "video_list_output": null,
+    "video_delete_output": null,
+    "cache_debug": null,
+    "latency": "4477.0",
+    "token_usage": "{\"prompt_tokens\":31,\"prompt_tokens_details\":{\"cached_tokens\":0},\"completion_tokens\":94,\"total_tokens\":125}",
+    "cost": "0.0025050000000000003",
+    "status": "success",
+    "error_details": null,
+    "stream": null,
+    "content_summary": "OBSERVABILITY_TEST_77bcae73: Explain observability in distributed systems in 2 sentences. Observability in distributed systems refers to the ability to understand the internal state of a system by exa",
+    "raw_request": null,
+    "raw_response": null,
+    "passthrough_request_body": null,
+    "passthrough_response_body": null,
+    "routing_engine_logs": null,
+    "metadata": null,
+    "is_large_payload_request": null,
+    "is_large_payload_response": null,
+    "prompt_tokens": "31",
+    "completion_tokens": "94",
+    "total_tokens": "125",
+    "created_at": "2026-03-19 19:14:27.057627+00:00"
+  }
+}

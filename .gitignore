@@ -1,0 +1,25 @@
+# Environment variables (API keys)
+.env
+
+# Bifrost local data
+.bifrost/
+*.db
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Node (from Bifrost npx)
+node_modules/

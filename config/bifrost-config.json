@@ -1,0 +1,45 @@
+{
+  "_comment": "Bifrost configuration used during product evaluation testing",
+  "_version": "v1.4.14",
+  "_date": "2026-03-19",
+  "_note": "Bifrost was run via 'npx -y @maximhq/bifrost' with Web UI config mode (config_store enabled). Providers were configured via the Web UI at localhost:8080. This file documents the configuration state, not the actual config file used (which is in config.db).",
+
+  "bifrost_cli_config": {
+    "_location": "~/.bifrost/config.json",
+    "base_url": "http://localhost:8080",
+    "default_harness": "claude",
+    "default_model": "claude-opus-4-6"
+  },
+
+  "providers_configured": [
+    {
+      "name": "anthropic",
+      "models": ["claude-opus-4-6", "claude-3-5-haiku-latest"],
+      "auth": "API key configured via Web UI",
+      "note": "Primary provider used during testing via Claude Code through Bifrost CLI"
+    },
+    {
+      "name": "openai",
+      "models": ["gpt-4o-mini"],
+      "auth": "API key configured via Web UI",
+      "note": "Added for multi-provider routing test"
+    }
+  ],
+
+  "plugins_enabled": [
+    "logging (auto-enabled in gateway mode)"
+  ],
+
+  "plugins_not_enabled": [
+    "maxim (requires config.json mode — blocked by config_store, see friction log F2/F3)",
+    "otel (not tested)"
+  ],
+
+  "environment": {
+    "os": "macOS (Darwin)",
+    "install_method": "npx -y @maximhq/bifrost",
+    "config_mode": "Web UI (config_store / SQLite)",
+    "data_dir": "~/.config/bifrost/",
+    "cli_config": "~/.bifrost/config.json"
+  }
+}
