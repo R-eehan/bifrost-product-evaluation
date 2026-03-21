@@ -1,25 +1,173 @@
 {
-  "test": "mcp_gateway_assessment",
-  "timestamp": "2026-03-20T00:44:41",
-  "config_discovery": {
-    "/api/v1/mcp/clients": {
-      "status": "ERROR",
-      "error": "Expecting value: line 1 column 1 (char 0)"
-    },
-    "/api/v1/mcp/tools": {
-      "status": "ERROR",
-      "error": "Expecting value: line 1 column 1 (char 0)"
-    },
-    "/api/v1/mcp/settings": {
-      "status": "ERROR",
-      "error": "Expecting value: line 1 column 1 (char 0)"
-    }
+  "test": "mcp_gateway_live_assessment",
+  "timestamp": "2026-03-21T13:26:29",
+  "mcp_server": "paper-desktop v0.1.10 (Paper.design)",
+  "design_task": "Landing page for fictional SaaS product (Beacon)",
+  "registration": {
+    "status": "REGISTERED",
+    "servers": [
+      {
+        "client_id": "65d7d47d-5e8a-4d10-b693-09d8854361c9",
+        "name": "paper",
+        "connection_type": "http",
+        "connection_string": "http://127.0.0.1:29979/mcp",
+        "is_code_mode_client": 0,
+        "is_ping_available": 1,
+        "created_at": "2026-03-21 13:05:51.605798+05:30"
+      }
+    ]
   },
-  "mcp_tool_logs": {
-    "status": "NO_MCP_LOGS",
-    "total_mcp_logs": 0,
-    "tool_calls_in_llm_logs": 0,
-    "observation": "Tool calls captured in LLM logs but not in dedicated MCP log table. This suggests the Claude Code session's tool calls were proxied but not routed through Bifrost's MCP gateway pipeline."
+  "tool_calls": {
+    "status": "ANALYZED",
+    "total": 11,
+    "tool_stats": [
+      {
+        "tool_name": "write_html",
+        "server_label": "paper",
+        "status": "success",
+        "call_count": 6,
+        "avg_latency_ms": 73.5,
+        "min_latency_ms": 12.0,
+        "max_latency_ms": 347.0
+      },
+      {
+        "tool_name": "create_artboard",
+        "server_label": "paper",
+        "status": "success",
+        "call_count": 1,
+        "avg_latency_ms": 29.0,
+        "min_latency_ms": 29.0,
+        "max_latency_ms": 29.0
+      },
+      {
+        "tool_name": "finish_working_on_nodes",
+        "server_label": "paper",
+        "status": "success",
+        "call_count": 1,
+        "avg_latency_ms": 3.0,
+        "min_latency_ms": 3.0,
+        "max_latency_ms": 3.0
+      },
+      {
+        "tool_name": "get_basic_info",
+        "server_label": "paper",
+        "status": "success",
+        "call_count": 1,
+        "avg_latency_ms": 20.0,
+        "min_latency_ms": 20.0,
+        "max_latency_ms": 20.0
+      },
+      {
+        "tool_name": "get_font_family_info",
+        "server_label": "paper",
+        "status": "success",
+        "call_count": 1,
+        "avg_latency_ms": 18.0,
+        "min_latency_ms": 18.0,
+        "max_latency_ms": 18.0
+      },
+      {
+        "tool_name": "get_screenshot",
+        "server_label": "paper",
+        "status": "success",
+        "call_count": 1,
+        "avg_latency_ms": 768.0,
+        "min_latency_ms": 768.0,
+        "max_latency_ms": 768.0
+      }
+    ],
+    "fields_captured": [
+      "id",
+      "timestamp",
+      "tool_name",
+      "server_label",
+      "arguments",
+      "result",
+      "latency",
+      "status",
+      "created_at"
+    ],
+    "fields_missing": [
+      "llm_request_id",
+      "virtual_key_id",
+      "virtual_key_name",
+      "error_details",
+      "cost",
+      "metadata"
+    ],
+    "timeline": [
+      {
+        "tool_name": "get_basic_info",
+        "latency": 20.0,
+        "created_at": "2026-03-21 07:47:30.836706+00:00"
+      },
+      {
+        "tool_name": "get_font_family_info",
+        "latency": 18.0,
+        "created_at": "2026-03-21 07:47:31.093195+00:00"
+      },
+      {
+        "tool_name": "create_artboard",
+        "latency": 29.0,
+        "created_at": "2026-03-21 07:47:40.786852+00:00"
+      },
+      {
+        "tool_name": "write_html",
+        "latency": 26.0,
+        "created_at": "2026-03-21 07:47:50.037849+00:00"
+      },
+      {
+        "tool_name": "write_html",
+        "latency": 18.0,
+        "created_at": "2026-03-21 07:48:03.244568+00:00"
+      },
+      {
+        "tool_name": "write_html",
+        "latency": 17.0,
+        "created_at": "2026-03-21 07:48:08.62398+00:00"
+      },
+      {
+        "tool_name": "write_html",
+        "latency": 21.0,
+        "created_at": "2026-03-21 07:48:17.572382+00:00"
+      },
+      {
+        "tool_name": "write_html",
+        "latency": 12.0,
+        "created_at": "2026-03-21 07:48:25.140275+00:00"
+      },
+      {
+        "tool_name": "write_html",
+        "latency": 347.0,
+        "created_at": "2026-03-21 07:48:32.936797+00:00"
+      },
+      {
+        "tool_name": "get_screenshot",
+        "latency": 768.0,
+        "created_at": "2026-03-21 07:48:37.077391+00:00"
+      },
+      {
+        "tool_name": "finish_working_on_nodes",
+        "latency": 3.0,
+        "created_at": "2026-03-21 07:48:45.747172+00:00"
+      }
+    ]
+  },
+  "cost_attribution": {
+    "status": "ANALYZED",
+    "llm_request_count": 11,
+    "mcp_call_count": 11,
+    "total_cost_usd": 0.532,
+    "total_tokens": 694275,
+    "prompt_tokens": 689845,
+    "completion_tokens": 4430,
+    "per_model": {
+      "claude-opus-4-6": {
+        "cost": 0.532,
+        "tokens": 694275,
+        "count": 11
+      }
+    }
   },
   "feature_boundary": {
     "features": [
@@ -27,19 +175,49 @@
         "name": "MCP Catalog (add servers)",
         "tier": "Free",
         "accessible": true,
-        "evidence": "Visible in Web UI sidebar under MCP Gateway"
+        "evidence": "Verified: registered Paper.design, 19 tools discovered"
       },
       {
         "name": "MCP Tool Logs",
         "tier": "Free",
         "accessible": true,
-        "evidence": "mcp_tool_logs table exists in logs.db"
+        "evidence": "Verified: 11 tool calls captured in mcp_tool_logs table"
       },
       {
         "name": "MCP Settings",
         "tier": "Free",
         "accessible": true,
         "evidence": "Visible in Web UI sidebar"
+      },
+      {
+        "name": "Per-tool observability",
+        "tier": "Free",
+        "accessible": true,
+        "evidence": "Verified: tool name, latency, status captured per call"
+      },
+      {
+        "name": "Code Mode (meta-tools)",
+        "tier": "Free",
+        "accessible": true,
+        "evidence": "Documented as OSS feature"
+      },
+      {
+        "name": "Manual/Agent/Code modes",
+        "tier": "Free",
+        "accessible": true,
+        "evidence": "Three execution modes in OSS"
+      },
+      {
+        "name": "Tool call approval flow",
+        "tier": "Free",
+        "accessible": true,
+        "evidence": "Manual mode = LLM suggests, app approves"
+      },
+      {
+        "name": "Tool allowlisting",
+        "tier": "Free",
+        "accessible": true,
+        "evidence": "Agent mode with allowlist"
       },
       {
         "name": "Tool Groups (RBAC)",
@@ -60,36 +238,6 @@
         "evidence": "Requires enterprise governance"
       },
       {
-        "name": "Code Mode (meta-tools)",
-        "tier": "Free",
-        "accessible": true,
-        "evidence": "Documented as OSS feature"
-      },
-      {
-        "name": "Manual/Agent/Code modes",
-        "tier": "Free",
-        "accessible": true,
-        "evidence": "Three execution modes in OSS"
-      },
-      {
-        "name": "Per-tool observability",
-        "tier": "Free",
-        "accessible": null,
-        "evidence": "Unknown \u2014 need to test with MCP server configured"
-      },
-      {
-        "name": "Tool call approval flow",
-        "tier": "Free",
-        "accessible": true,
-        "evidence": "Manual mode = LLM suggests, app approves"
-      },
-      {
-        "name": "Tool allowlisting",
-        "tier": "Free",
-        "accessible": true,
-        "evidence": "Agent mode with allowlist"
-      },
-      {
         "name": "Federated MCP (API\u2192MCP)",
         "tier": "Enterprise",
         "accessible": false,
@@ -99,22 +247,34 @@
     "free_count": 8,
     "enterprise_count": 4
   },
-  "conversion_assessment": {
-    "observations": [
+  "business_case": {
+    "status": "PROJECTED",
+    "cost_per_design": 0.532,
+    "tool_calls_per_design": 11,
+    "scenarios": [
       {
-        "signal": "POSITIVE",
-        "finding": "Free tier has 8 MCP features \u2014 enough to be genuinely useful",
-        "impact": "Developers will actually adopt the MCP gateway, not just try it"
+        "team_size": 5,
+        "designs_per_week": 3,
+        "label": "Small pilot (5 designers, 3 designs/week)",
+        "weekly_cost": 7.98,
+        "monthly_cost": 31.92,
+        "annual_cost": 383.04
       },
       {
-        "signal": "GAP",
-        "finding": "No MCP tool calls in dedicated log table despite tool_calls in LLM logs",
-        "impact": "The free MCP experience may not feel differentiated from basic proxying. If tool calls only appear in LLM logs (not a dedicated MCP view), the governance narrative doesn't start building."
+        "team_size": 10,
+        "designs_per_week": 5,
+        "label": "Medium team (10 designers, 5 designs/week)",
+        "weekly_cost": 26.6,
+        "monthly_cost": 106.4,
+        "annual_cost": 1276.8
       },
       {
-        "signal": "PRESENT_BUT_WEAK",
-        "finding": "Enterprise features show 'Book a demo' paywall in Web UI",
-        "impact": "The paywall exists but doesn't explain WHY governance matters. A developer who hasn't felt the pain of uncontrolled tool access won't be motivated to 'Book a demo'. The free tier should surface the governance gap (e.g., 'X tool calls had no authorization policy') before presenting the gate."
+        "team_size": 20,
+        "designs_per_week": 5,
+        "label": "Full rollout (20 designers, 5 designs/week)",
+        "weekly_cost": 53.2,
+        "monthly_cost": 212.8,
+        "annual_cost": 2553.6
       }
     ]
   }
