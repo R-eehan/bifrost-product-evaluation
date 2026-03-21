@@ -1,6 +1,10 @@
 # Environment variables (API keys)
 .env
 
+# Local source material (not for public repo)
+setup/friction-log.md
+FINDINGS.md
+
 # Bifrost local data
 .bifrost/
 *.db

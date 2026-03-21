@@ -1,6 +1,6 @@
 {
   "test": "multi_provider_routing",
-  "timestamp": "2026-03-20T00:44:10",
+  "timestamp": "2026-03-21T14:21:55",
   "bifrost_url": "http://localhost:8080",
   "prompt": "Explain what an AI gateway is in exactly 2 sentences.",
   "routing_results": [
@@ -8,30 +8,30 @@
       "model": "OpenAI GPT-4o-mini",
       "model_id": "openai/gpt-4o-mini",
       "status": "SUCCESS",
-      "latency_ms": 1601.5,
+      "latency_ms": 3209.5,
       "tokens": {
-        "prompt_tokens": 19,
-        "completion_tokens": 54,
-        "total_tokens": 73
+        "prompt_tokens": 2912,
+        "completion_tokens": 57,
+        "total_tokens": 2969
       },
-      "response_preview": "An AI gateway is a software or hardware interface that facilitates communication between artificial intelligence systems and other applications or services, enabling seamless data exchange and integra"
+      "response_preview": "An AI gateway is a software interface that allows different applications or systems to communicate with artificial intelligence models and services, facilitating access to AI capabilities. It acts as "
     },
     {
       "model": "Anthropic Claude Opus 4.6",
       "model_id": "anthropic/claude-opus-4-6",
       "status": "SUCCESS",
-      "latency_ms": 4432.9,
+      "latency_ms": 6532.3,
       "tokens": {
-        "prompt_tokens": 21,
-        "completion_tokens": 77,
-        "total_tokens": 98
+        "prompt_tokens": 4847,
+        "completion_tokens": 81,
+        "total_tokens": 4928
       },
-      "response_preview": "An AI gateway is a middleware layer that sits between applications and AI model providers, acting as a centralized point for managing, routing, and monitoring API requests to one or more large languag"
+      "response_preview": "An AI gateway is a centralized infrastructure layer that sits between applications and AI model providers, managing API requests by handling routing, authentication, rate limiting, caching, and observ"
     }
   ],
   "failover_result": {
     "status": "ERROR_RETURNED",
-    "latency_ms": 1175.0,
+    "latency_ms": 1230.7,
     "error": "Error code: 404 - {'is_bifrost_error': False, 'status_code': 404, 'error': {'type': 'invalid_request_error', 'code': 'model_not_found', 'message': 'The model `gpt-nonexistent-model` does not exist or you do not have access to it.'}, 'extra_fields': {'provider': 'openai', 'model_requested': 'gpt-nonexistent-model', 'request_type': 'chat_completion'}}",
     "observation": "Check: Is the error message clear enough to debug? Does it tell the developer what models ARE available?"
   }

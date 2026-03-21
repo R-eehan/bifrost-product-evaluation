@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MCP Cost Attribution — Maxim AI Concept</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #FFFFFF;
+  --bg-subtle: #F9FAFB;
+  --bg-muted: #F3F4F6;
+  --border: #E5E7EB;
+  --border-strong: #D1D5DB;
+  --text-primary: #111827;
+  --text-secondary: #6B7280;
+  --text-tertiary: #9CA3AF;
+  --accent: #4F46E5;
+  --accent-bg: #EEF2FF;
+  --amber-bg: #FFFBEB;
+  --amber-border: #FDE68A;
+  --amber-text: #92400E;
+  --chart-bar: #6366F1;
+  --chart-bar-light: #A5B4FC;
+  --sidebar-w: 48px;
+  --header-h: 44px;
+  --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: var(--font); font-size: 13px; color: var(--text-primary); background: var(--bg); display: flex; min-height: 100vh; -webkit-font-smoothing: antialiased; line-height: 1.5; }
+
+/* ─── Sidebar ─── */
+.sidebar {
+  width: var(--sidebar-w); background: var(--bg); border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; align-items: center; padding: 10px 0;
+  position: fixed; top: 0; bottom: 0; left: 0; z-index: 40; overflow-y: auto;
+}
+.sidebar-logo {
+  width: 28px; height: 28px; border-radius: 6px; margin-bottom: 12px;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #4F46E5, #6D28D9); color: #fff;
+  font-weight: 700; font-size: 13px; flex-shrink: 0;
+}
+.sidebar-section-label {
+  font-size: 7.5px; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase;
+  color: var(--text-tertiary); margin: 10px 0 2px; text-align: center;
+}
+.sidebar-icon {
+  width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;
+  border-radius: 6px; color: var(--text-secondary); cursor: pointer; margin: 1px 0;
+  transition: all 0.15s; position: relative;
+}
+.sidebar-icon:hover { background: var(--bg-muted); color: var(--text-primary); }
+.sidebar-icon.active { background: var(--accent-bg); color: var(--accent); }
+.sidebar-icon svg { width: 17px; height: 17px; stroke-width: 1.8; }
+.sidebar-spacer { flex: 1; }
+.sidebar-bottom { display: flex; flex-direction: column; align-items: center; gap: 1px; }
+.sidebar-badge {
+  position: absolute; top: 4px; right: 3px; width: 14px; height: 14px;
+  background: #DC2626; color: #fff; font-size: 8px; font-weight: 700;
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+}
+
+/* ─── Main layout ─── */
+.main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.top-bar {
+  height: var(--header-h); border-bottom: 1px solid var(--border); padding: 0 20px;
+  display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+}
+.breadcrumb-top { font-size: 12px; color: var(--text-tertiary); display: flex; align-items: center; gap: 4px; }
+.breadcrumb-top span { color: var(--text-secondary); }
+.top-right { display: flex; align-items: center; gap: 12px; }
+.top-btn {
+  font-size: 12px; font-weight: 500; padding: 5px 12px; border-radius: 6px;
+  border: 1px solid var(--border); background: var(--bg); color: var(--text-secondary);
+  cursor: pointer; transition: all 0.15s;
+}
+.top-btn:hover { border-color: var(--border-strong); color: var(--text-primary); }
+.avatar {
+  width: 26px; height: 26px; border-radius: 50%; background: var(--accent);
+  color: #fff; font-size: 11px; font-weight: 600; display: flex; align-items: center;
+  justify-content: center;
+}
+
+/* ─── Content header ─── */
+.content-header { padding: 14px 20px 0; }
+.breadcrumb-content { font-size: 11px; color: var(--text-tertiary); margin-bottom: 2px; }
+.breadcrumb-content a { color: var(--text-tertiary); text-decoration: none; }
+.breadcrumb-content a:hover { color: var(--text-primary); }
+.page-title-row { display: flex; align-items: center; justify-content: space-between; }
+.page-title { font-size: 18px; font-weight: 600; color: var(--text-primary); }
+.manage-eval { font-size: 12px; color: var(--text-secondary); cursor: pointer; }
+.tabs-row {
+  display: flex; align-items: center; padding: 0 20px; border-bottom: 1px solid var(--border);
+  margin-top: 10px;
+}
+.tab {
+  padding: 10px 14px; font-size: 13px; color: var(--text-secondary); cursor: pointer;
+  border-bottom: 2px solid transparent; font-weight: 500; transition: all 0.15s;
+}
+.tab:hover { color: var(--text-primary); }
+.tab.active { color: var(--text-primary); border-bottom-color: var(--text-primary); }
+
+/* ─── Concept banner ─── */
+.concept-banner {
+  background: var(--amber-bg); border-bottom: 1px solid var(--amber-border);
+  padding: 10px 20px; display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; flex-shrink: 0;
+}
+.concept-banner-left { display: flex; align-items: center; gap: 10px; }
+.concept-badge {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;
+  background: #FDE68A; color: var(--amber-text); padding: 3px 8px; border-radius: 4px;
+  white-space: nowrap;
+}
+.concept-text { font-size: 12px; color: var(--amber-text); line-height: 1.4; }
+.concept-text strong { font-weight: 600; }
+.view-toggle {
+  display: flex; background: #FEF3C7; border-radius: 8px; padding: 3px; flex-shrink: 0;
+}
+.view-toggle-btn {
+  padding: 6px 14px; font-size: 12px; font-weight: 500; border-radius: 6px;
+  cursor: pointer; border: none; background: transparent; color: var(--amber-text);
+  transition: all 0.2s; white-space: nowrap;
+}
+.view-toggle-btn.active { background: #fff; color: var(--text-primary); box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+
+/* ─── Tab content ─── */
+.tab-content { display: none; flex: 1; flex-direction: column; overflow: hidden; }
+.tab-content.active { display: flex; }
+
+/* ─── Overview ─── */
+.overview-content { padding: 20px; overflow-y: auto; flex: 1; }
+.overview-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+.overview-card {
+  border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px;
+  background: var(--bg);
+}
+.overview-card-title {
+  font-size: 10px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
+  color: var(--text-tertiary); margin-bottom: 12px;
+}
+.overview-metrics { display: flex; gap: 28px; }
+.overview-metric {}
+.overview-metric-value { font-size: 24px; font-weight: 700; color: var(--text-primary); }
+.overview-metric-label { font-size: 12px; color: var(--text-secondary); margin-top: 1px; }
+.overview-chart-placeholder {
+  height: 120px; background: var(--bg-subtle); border-radius: 8px; margin-top: 14px;
+  display: flex; align-items: flex-end; justify-content: center; padding: 12px; gap: 6px;
+}
+.overview-bar {
+  width: 24px; border-radius: 3px 3px 0 0; background: var(--chart-bar); opacity: 0.7;
+  transition: opacity 0.15s;
+}
+.overview-bar:hover { opacity: 1; }
+.overview-bar.secondary { background: var(--chart-bar-light); }
+.overview-bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.overview-small-card {
+  border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px;
+}
+.overview-small-value { font-size: 20px; font-weight: 700; margin-top: 8px; }
+.overview-small-sub { display: flex; gap: 16px; margin-top: 4px; font-size: 12px; color: var(--text-secondary); }
+.overview-small-sub strong { font-weight: 600; color: var(--text-primary); }
+
+/* ─── MCP Cost Attribution (overview, proposed) ─── */
+.mcp-attribution-section {
+  display: none; margin-top: 20px; animation: fadeSlideIn 0.3s ease;
+}
+.proposed .mcp-attribution-section { display: block; }
+.mcp-section-header {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;
+}
+.mcp-section-title {
+  font-size: 14px; font-weight: 600; color: var(--text-primary);
+  display: flex; align-items: center; gap: 8px;
+}
+.mcp-section-title svg { width: 18px; height: 18px; color: var(--text-primary); }
+.mcp-section-subtitle { font-size: 12px; color: var(--text-secondary); }
+.mcp-servers-grid { display: flex; flex-direction: column; gap: 12px; }
+.mcp-server-block {
+  border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px;
+  background: var(--bg);
+}
+.mcp-server-header {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;
+}
+.mcp-server-name {
+  font-size: 13px; font-weight: 600; color: var(--text-primary);
+  display: flex; align-items: center; gap: 6px;
+}
+.mcp-server-dot { width: 8px; height: 8px; border-radius: 50%; }
+.mcp-server-stats { font-size: 12px; color: var(--text-secondary); display: flex; gap: 14px; }
+.mcp-server-stats strong { font-weight: 600; color: var(--text-primary); }
+.mcp-tools-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.mcp-tool-chip {
+  border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px;
+  background: var(--bg); flex: 1; min-width: 140px; max-width: 200px;
+  transition: all 0.15s;
+}
+.mcp-tool-chip:hover { border-color: var(--border-strong); box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+.mcp-tool-chip-name { font-size: 11px; font-weight: 600; color: var(--text-primary); margin-bottom: 3px; }
+.mcp-tool-chip-cost { font-size: 18px; font-weight: 700; color: var(--text-primary); }
+.mcp-tool-chip-meta { font-size: 10px; color: var(--text-secondary); margin-top: 2px; }
+.mcp-tool-chip-bar { height: 3px; border-radius: 2px; margin-top: 6px; }
+.mcp-tool-chip-bar.paper { background: var(--chart-bar); opacity: 0.5; }
+.mcp-tool-chip-bar.github { background: var(--chart-bar); opacity: 0.5; }
+.mcp-tool-chip-bar.internal { background: var(--chart-bar); opacity: 0.5; }
+
+/* ─── Controls row ─── */
+.controls-row {
+  display: flex; align-items: center; padding: 10px 20px; gap: 8px; flex-shrink: 0;
+}
+.search-input {
+  flex: 1; max-width: 340px; padding: 6px 10px 6px 30px; border: 1px solid var(--border);
+  border-radius: 6px; font-size: 12px; color: var(--text-primary); outline: none;
+  font-family: var(--font); background: var(--bg);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%239CA3AF' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: 8px center;
+}
+.search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-bg); }
+.controls-right { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+.ctrl-btn {
+  padding: 5px 10px; font-size: 12px; font-weight: 500; border: 1px solid var(--border);
+  border-radius: 6px; background: var(--bg); color: var(--text-secondary);
+  cursor: pointer; display: flex; align-items: center; gap: 4px; transition: all 0.15s;
+}
+.ctrl-btn:hover { border-color: var(--border-strong); color: var(--text-primary); }
+.ctrl-btn svg { width: 14px; height: 14px; }
+.segment-ctrl { display: flex; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+.segment-btn {
+  padding: 5px 12px; font-size: 12px; font-weight: 500; border: none;
+  background: var(--bg); color: var(--text-secondary); cursor: pointer;
+}
+.segment-btn:not(:last-child) { border-right: 1px solid var(--border); }
+.segment-btn.active { background: var(--bg-subtle); color: var(--text-primary); }
+.status-row {
+  padding: 6px 20px 8px; display: flex; align-items: center; justify-content: space-between;
+  font-size: 12px; color: var(--text-secondary);
+}
+.set-limit { color: var(--accent); cursor: pointer; font-weight: 500; }
+
+/* ─── Table ─── */
+.table-container { flex: 1; overflow: auto; padding: 0 20px 20px; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead { position: sticky; top: 0; z-index: 5; }
+thead th {
+  background: var(--bg-subtle); padding: 8px 12px; text-align: left; font-weight: 500;
+  color: var(--text-secondary); font-size: 12px; border-bottom: 1px solid var(--border);
+  white-space: nowrap; cursor: pointer; user-select: none;
+}
+thead th:hover { color: var(--text-primary); }
+thead th .sort-icon { font-size: 10px; margin-left: 2px; opacity: 0.5; }
+tbody tr { border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.1s; }
+tbody tr:hover { background: var(--bg-subtle); }
+tbody td { padding: 10px 12px; vertical-align: middle; max-width: 200px; }
+.cell-truncate { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cell-name { font-weight: 500; color: var(--text-primary); }
+.cell-muted { color: var(--text-secondary); font-size: 12px; }
+.cell-mono { font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace; font-size: 12px; }
+.cell-cost { font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace; font-size: 12px; text-align: right; }
+.model-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: var(--text-secondary); }
+.model-icon {
+  width: 16px; height: 16px; border-radius: 3px; display: inline-flex;
+  align-items: center; justify-content: center; font-size: 9px; font-weight: 700; flex-shrink: 0;
+}
+.model-icon.anthropic { background: #D4A574; color: #fff; }
+.model-icon.openai { background: #10A37F; color: #fff; }
+.tag-pill {
+  display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px;
+  background: var(--bg-muted); border-radius: 4px; font-size: 11px; color: var(--text-secondary);
+  white-space: nowrap;
+}
+.tag-pill .tag-key { font-weight: 500; }
+.col-mcp { display: none; }
+.proposed .col-mcp { display: table-cell; }
+.mcp-tool-pill {
+  display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px;
+  border-radius: 5px; font-size: 11px; font-weight: 500; white-space: nowrap;
+}
+.mcp-tool-pill.paper { background: var(--bg-muted); color: var(--text-primary); }
+.mcp-tool-pill.github { background: var(--bg-muted); color: var(--text-primary); }
+.mcp-tool-pill.internal { background: var(--bg-muted); color: var(--text-primary); }
+.mcp-tool-pill svg { width: 11px; height: 11px; }
+.mcp-server-label { font-size: 9px; color: var(--text-tertiary); display: block; margin-top: 1px; }
+
+/* ─── Trace Panel ─── */
+.trace-overlay {
+  position: fixed; top: 0; right: 0; bottom: 0; left: var(--sidebar-w);
+  background: rgba(0,0,0,0.15); z-index: 50; display: none; opacity: 0; transition: opacity 0.2s;
+}
+.trace-overlay.open { display: block; opacity: 1; }
+.trace-panel {
+  position: fixed; top: 0; right: 0; bottom: 0; width: 720px;
+  background: var(--bg); box-shadow: -4px 0 24px rgba(0,0,0,0.12);
+  z-index: 51; transform: translateX(100%); transition: transform 0.25s ease;
+  display: flex; flex-direction: column;
+}
+.trace-overlay.open .trace-panel { transform: translateX(0); }
+.trace-header { padding: 14px 20px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.trace-header-top { display: flex; align-items: center; justify-content: space-between; }
+.trace-title { font-size: 15px; font-weight: 600; }
+.trace-actions { display: flex; align-items: center; gap: 8px; }
+.trace-action-btn {
+  padding: 4px 10px; font-size: 12px; border: 1px solid var(--border); border-radius: 6px;
+  background: var(--bg); color: var(--text-secondary); cursor: pointer;
+  display: flex; align-items: center; gap: 4px;
+}
+.trace-action-btn:hover { border-color: var(--border-strong); }
+.trace-close {
+  width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
+  border-radius: 6px; border: none; background: none; cursor: pointer;
+  color: var(--text-secondary); font-size: 18px;
+}
+.trace-close:hover { background: var(--bg-muted); }
+.trace-id { font-size: 11px; color: var(--text-tertiary); margin-top: 2px; font-family: 'SF Mono', monospace; }
+.trace-tabs-inner { display: flex; border-bottom: 1px solid var(--border); padding: 0 20px; flex-shrink: 0; }
+.trace-tab {
+  padding: 10px 14px; font-size: 13px; color: var(--text-secondary); cursor: pointer;
+  border-bottom: 2px solid transparent; font-weight: 500;
+}
+.trace-tab.active { color: var(--text-primary); border-bottom-color: var(--text-primary); }
+.trace-body { display: flex; flex: 1; overflow: hidden; }
+.trace-spans {
+  width: 280px; border-right: 1px solid var(--border); padding: 12px;
+  overflow-y: auto; flex-shrink: 0;
+}
+.trace-spans-search {
+  width: 100%; padding: 5px 8px; border: 1px solid var(--border); border-radius: 5px;
+  font-size: 11px; color: var(--text-tertiary); margin-bottom: 10px; font-family: var(--font);
+}
+.span-item {
+  padding: 6px 8px; border-radius: 6px; cursor: pointer; margin-bottom: 2px;
+  transition: background 0.1s; display: flex; align-items: center; justify-content: space-between;
+}
+.span-item:hover { background: var(--bg-muted); }
+.span-item.active { background: var(--accent-bg); }
+.span-left { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.span-expand { width: 14px; color: var(--text-tertiary); flex-shrink: 0; font-size: 10px; }
+.span-icon {
+  width: 18px; height: 18px; border-radius: 4px; display: flex; align-items: center;
+  justify-content: center; flex-shrink: 0; font-size: 9px;
+}
+.span-icon.completion { background: #DBEAFE; color: #2563EB; }
+.span-icon.llm { background: #FEF3C7; color: #D97706; }
+.span-icon.mcp { background: var(--bg-subtle); color: var(--text-primary); }
+.span-name { font-size: 12px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.span-meta { font-size: 10px; color: var(--text-tertiary); display: flex; align-items: center; gap: 4px; }
+.span-right { font-size: 11px; color: var(--text-secondary); white-space: nowrap; flex-shrink: 0; margin-left: 8px; }
+.span-children { padding-left: 18px; }
+.span-mcp-new { display: none; }
+.proposed .span-mcp-new { display: block; }
+.trace-details { flex: 1; padding: 16px 20px; overflow-y: auto; }
+.trace-detail-type {
+  display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px;
+  background: var(--bg-muted); border-radius: 6px; font-size: 12px; font-weight: 500;
+  margin-bottom: 14px;
+}
+.trace-detail-row { display: flex; gap: 32px; margin-bottom: 16px; }
+.trace-detail-label {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase;
+  color: var(--text-tertiary); margin-bottom: 3px;
+}
+.trace-detail-value { font-size: 13px; font-weight: 500; color: var(--text-primary); }
+.trace-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+.trace-section-label {
+  font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
+  color: var(--text-secondary); margin-bottom: 6px; margin-top: 12px;
+}
+.trace-content-block {
+  background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 8px;
+  padding: 12px; font-size: 12px; line-height: 1.6; color: var(--text-primary);
+  margin-bottom: 12px; white-space: pre-wrap; font-family: 'SF Mono', monospace;
+  max-height: 140px; overflow-y: auto;
+}
+.trace-mcp-attribution {
+  display: none; margin-top: 16px; padding: 14px; background: var(--bg-subtle);
+  border: 1px solid var(--border); border-radius: 10px; animation: fadeSlideIn 0.3s ease;
+}
+.proposed .trace-mcp-attribution { display: block; }
+.trace-mcp-title {
+  font-size: 12px; font-weight: 600; color: var(--text-primary);
+  display: flex; align-items: center; gap: 6px; margin-bottom: 10px;
+}
+.trace-mcp-title svg { width: 14px; height: 14px; }
+.trace-mcp-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.trace-mcp-field { background: #fff; border-radius: 6px; padding: 8px 10px; }
+.trace-mcp-field-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; color: var(--text-tertiary); }
+.trace-mcp-field-value { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-top: 2px; }
+
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes pulseHighlight {
+  0% { box-shadow: 0 0 0 0 rgba(107,114,128,0.3); }
+  50% { box-shadow: 0 0 0 4px rgba(107,114,128,0.15); }
+  100% { box-shadow: 0 0 0 0 rgba(107,114,128,0); }
+}
+.pulse-new { animation: pulseHighlight 1.5s ease 0.3s; }
+.table-container table { min-width: 900px; }
+</style>
+</head>
+<body>
+
+<!-- ═══ Sidebar ═══ -->
+<nav class="sidebar">
+  <div class="sidebar-logo">M</div>
+  <div class="sidebar-section-label">EVALUATE</div>
+  <div class="sidebar-icon" title="Prompts"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+  <div class="sidebar-icon" title="Agents"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 12h.01"/><path d="M17 12h.01"/><path d="M7 12h.01"/></svg></div>
+  <div class="sidebar-icon" title="Runs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+  <div class="sidebar-section-label">OBSERVE</div>
+  <div class="sidebar-icon active" title="Logs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+  <div class="sidebar-section-label">ANALYZE</div>
+  <div class="sidebar-icon" title="Dashboards"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></div>
+  <div class="sidebar-section-label">LIBRARY</div>
+  <div class="sidebar-icon" title="Evaluators"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+  <div class="sidebar-icon" title="Datasets"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg></div>
+  <div class="sidebar-icon" title="Context sources"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></div>
+  <div class="sidebar-icon" title="Prompt tools"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div>
+  <div class="sidebar-icon" title="Prompt partials"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg></div>
+  <div class="sidebar-spacer"></div>
+  <div class="sidebar-bottom">
+    <div class="sidebar-icon" title="What's new" style="position:relative"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="sidebar-badge">5</span></div>
+    <div class="sidebar-icon" title="Support"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+    <div class="sidebar-icon" title="Documentation"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
+    <div class="sidebar-icon" title="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
+  </div>
+</nav>
+
+<!-- ═══ Main ═══ -->
+<div class="main" id="mainContent">
+  <div class="top-bar">
+    <div class="breadcrumb-top">Personal exploration &nbsp;/&nbsp; <span>My Workspace</span> &nbsp;☆</div>
+    <div class="top-right">
+      <button class="top-btn">Upgrade</button>
+      <button class="top-btn">Invite</button>
+      <div class="avatar">R</div>
+    </div>
+  </div>
+
+  <!-- Concept banner -->
+  <div class="concept-banner">
+    <div class="concept-banner-left">
+      <span class="concept-badge">Product Concept</span>
+      <span class="concept-text"><strong>MCP Cost Attribution</strong> — Proposed Maxim enhancement. Toggle to see the feature delta.</span>
+    </div>
+    <div class="view-toggle" id="viewToggle">
+      <button class="view-toggle-btn active" data-mode="current" onclick="setMode('current')">Current State</button>
+      <button class="view-toggle-btn" data-mode="proposed" onclick="setMode('proposed')">Proposed</button>
+    </div>
+  </div>
+
+  <!-- Content header -->
+  <div class="content-header">
+    <div class="breadcrumb-content"><a href="#">Log repositories</a> &nbsp;&rsaquo;&nbsp; bifrost-connection</div>
+    <div class="page-title-row">
+      <div class="page-title">bifrost-connection</div>
+      <div class="manage-eval">Manage evaluation ···</div>
+    </div>
+  </div>
+
+  <!-- Main Tabs: Overview / Logs / Alerts -->
+  <div class="tabs-row">
+    <div class="tab" data-tab="overview" onclick="switchTab('overview')">Overview</div>
+    <div class="tab active" data-tab="logs" onclick="switchTab('logs')">Logs</div>
+    <div class="tab" data-tab="alerts" onclick="switchTab('alerts')">Alerts</div>
+  </div>
+
+  <!-- ═══ OVERVIEW TAB ═══ -->
+  <div class="tab-content" data-tab-content="overview">
+    <div class="overview-content">
+      <!-- Existing Maxim metrics -->
+      <div class="overview-grid">
+        <div class="overview-card">
+          <div class="overview-card-title">Cost</div>
+          <div class="overview-metrics">
+            <div class="overview-metric">
+              <div class="overview-metric-value">$0.53</div>
+              <div class="overview-metric-label">Input</div>
+            </div>
+            <div class="overview-metric">
+              <div class="overview-metric-value">$3.89</div>
+              <div class="overview-metric-label">Completion</div>
+            </div>
+          </div>
+          <div class="overview-chart-placeholder">
+            <div class="overview-bar" style="height:15%"></div>
+            <div class="overview-bar secondary" style="height:8%"></div>
+            <div class="overview-bar" style="height:12%"></div>
+            <div class="overview-bar secondary" style="height:6%"></div>
+            <div class="overview-bar" style="height:20%"></div>
+            <div class="overview-bar secondary" style="height:10%"></div>
+            <div class="overview-bar" style="height:45%"></div>
+            <div class="overview-bar secondary" style="height:22%"></div>
+            <div class="overview-bar" style="height:80%"></div>
+            <div class="overview-bar secondary" style="height:40%"></div>
+            <div class="overview-bar" style="height:95%"></div>
+            <div class="overview-bar secondary" style="height:50%"></div>
+          </div>
+        </div>
+        <div class="overview-card">
+          <div class="overview-card-title">Tokens</div>
+          <div class="overview-metrics">
+            <div class="overview-metric">
+              <div class="overview-metric-value">847k</div>
+              <div class="overview-metric-label">Total</div>
+            </div>
+            <div class="overview-metric">
+              <div class="overview-metric-value">830k</div>
+              <div class="overview-metric-label">Input</div>
+            </div>
+            <div class="overview-metric">
+              <div class="overview-metric-value">17.2k</div>
+              <div class="overview-metric-label">Completion</div>
+            </div>
+          </div>
+          <div class="overview-chart-placeholder">
+            <div class="overview-bar" style="height:20%"></div>
+            <div class="overview-bar" style="height:15%"></div>
+            <div class="overview-bar" style="height:25%"></div>
+            <div class="overview-bar" style="height:18%"></div>
+            <div class="overview-bar" style="height:55%"></div>
+            <div class="overview-bar" style="height:40%"></div>
+            <div class="overview-bar" style="height:70%"></div>
+            <div class="overview-bar" style="height:85%"></div>
+            <div class="overview-bar" style="height:95%"></div>
+            <div class="overview-bar" style="height:90%"></div>
+          </div>
+        </div>
+      </div>
+      <div class="overview-bottom-grid">
+        <div class="overview-small-card">
+          <div class="overview-card-title">Average Latency</div>
+          <div class="overview-small-value">5.73s</div>
+          <div class="overview-small-sub">
+            <span><strong>4.24s</strong> p98</span>
+            <span><strong>4.38s</strong> p95</span>
+            <span><strong>4.50s</strong> p99</span>
+          </div>
+        </div>
+        <div class="overview-small-card">
+          <div class="overview-card-title">Average Errors</div>
+          <div class="overview-small-value">0.33</div>
+        </div>
+      </div>
+
+      <!-- ═══ PROPOSED: MCP Cost Attribution Section ═══ -->
+      <div class="mcp-attribution-section">
+        <div class="mcp-section-header">
+          <div>
+            <div class="mcp-section-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+              MCP Tool Cost Attribution
+            </div>
+            <div class="mcp-section-subtitle">LLM cost attributed to MCP tool calls across all sessions · Powered by Bifrost MCP Gateway</div>
+          </div>
+        </div>
+
+        <!-- Paper.design server -->
+        <div class="mcp-servers-grid">
+          <div class="mcp-server-block pulse-new">
+            <div class="mcp-server-header">
+              <div class="mcp-server-name">
+                <span class="mcp-server-dot" style="background:var(--text-primary)"></span>
+                Paper.design
+              </div>
+              <div class="mcp-server-stats">
+                <span><strong>19</strong> tools registered</span>
+                <span><strong>11</strong> calls</span>
+                <span><strong>$4.02</strong> attributed LLM cost</span>
+                <span><strong>3</strong> sessions</span>
+              </div>
+            </div>
+            <div class="mcp-tools-row">
+              <div class="mcp-tool-chip">
+                <div class="mcp-tool-chip-name">write_html</div>
+                <div class="mcp-tool-chip-cost">$2.49</div>
+                <div class="mcp-tool-chip-meta">3 calls · 62% of server spend</div>
+                <div class="mcp-tool-chip-bar paper" style="width:62%"></div>
+              </div>
+              <div class="mcp-tool-chip">
+                <div class="mcp-tool-chip-name">get_screenshot</div>
+                <div class="mcp-tool-chip-cost">$0.60</div>
+                <div class="mcp-tool-chip-meta">2 calls · 15%</div>
+                <div class="mcp-tool-chip-bar paper" style="width:15%"></div>
+              </div>
+              <div class="mcp-tool-chip">
+                <div class="mcp-tool-chip-name">get_tree_summary</div>
+                <div class="mcp-tool-chip-cost">$0.36</div>
+                <div class="mcp-tool-chip-meta">2 calls · 9%</div>
+                <div class="mcp-tool-chip-bar paper" style="width:9%"></div>
+              </div>
+              <div class="mcp-tool-chip">
+                <div class="mcp-tool-chip-name">update_styles</div>
+                <div class="mcp-tool-chip-cost">$0.33</div>
+                <div class="mcp-tool-chip-meta">2 calls · 8%</div>
+                <div class="mcp-tool-chip-bar paper" style="width:8%"></div>
+              </div>
+              <div class="mcp-tool-chip">
+                <div class="mcp-tool-chip-name">get_basic_info</div>
+                <div class="mcp-tool-chip-cost">$0.16</div>
+                <div class="mcp-tool-chip-meta">1 call · 4%</div>
+                <div class="mcp-tool-chip-bar paper" style="width:4%"></div>
+              </div>
+              <div class="mcp-tool-chip">
+                <div class="mcp-tool-chip-name">get_fill_image</div>
+                <div class="mcp-tool-chip-cost">$0.08</div>
+                <div class="mcp-tool-chip-meta">1 call · 2%</div>
+                <div class="mcp-tool-chip-bar paper" style="width:2%"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- GitHub MCP server (hypothetical, shows multi-server) -->
+          <div class="mcp-server-block">
+            <div class="mcp-server-header">
+              <div class="mcp-server-name">
+                <span class="mcp-server-dot" style="background:var(--text-tertiary)"></span>
+                GitHub
+              </div>
+              <div class="mcp-server-stats">
+                <span><strong>12</strong> tools registered</span>
+                <span><strong>8</strong> calls</span>
+                <span><strong>$1.24</strong> attributed LLM cost</span>
+                <span><strong>5</strong> sessions</span>
+              </div>
+            </div>
+            <div class="mcp-tools-row">
+              <div class="mcp-tool-chip">
+                <div class="mcp-tool-chip-name">search_code</div>
+                <div class="mcp-tool-chip-cost">$0.58</div>
+                <div class="mcp-tool-chip-meta">3 calls · 47%</div>
+                <div class="mcp-tool-chip-bar github" style="width:47%"></div>
+              </div>
+              <div class="mcp-tool-chip">
+                <div class="mcp-tool-chip-name">create_pull_request</div>
+                <div class="mcp-tool-chip-cost">$0.41</div>
+                <div class="mcp-tool-chip-meta">2 calls · 33%</div>
+                <div class="mcp-tool-chip-bar github" style="width:33%"></div>
+              </div>
+              <div class="mcp-tool-chip">
+                <div class="mcp-tool-chip-name">list_issues</div>
+                <div class="mcp-tool-chip-cost">$0.25</div>
+                <div class="mcp-tool-chip-meta">3 calls · 20%</div>
+                <div class="mcp-tool-chip-bar github" style="width:20%"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Internal tools server -->
+          <div class="mcp-server-block">
+            <div class="mcp-server-header">
+              <div class="mcp-server-name">
+                <span class="mcp-server-dot" style="background:var(--border-strong)"></span>
+                internal-deploy-tools
+              </div>
+              <div class="mcp-server-stats">
+                <span><strong>5</strong> tools registered</span>
+                <span><strong>4</strong> calls</span>
+                <span><strong>$0.31</strong> attributed LLM cost</span>
+                <span><strong>2</strong> sessions</span>
+              </div>
+            </div>
+            <div class="mcp-tools-row">
+              <div class="mcp-tool-chip">
+                <div class="mcp-tool-chip-name">run_deploy</div>
+                <div class="mcp-tool-chip-cost">$0.19</div>
+                <div class="mcp-tool-chip-meta">2 calls · 61%</div>
+                <div class="mcp-tool-chip-bar internal" style="width:61%"></div>
+              </div>
+              <div class="mcp-tool-chip">
+                <div class="mcp-tool-chip-name">check_status</div>
+                <div class="mcp-tool-chip-cost">$0.12</div>
+                <div class="mcp-tool-chip-meta">2 calls · 39%</div>
+                <div class="mcp-tool-chip-bar internal" style="width:39%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ LOGS TAB ═══ -->
+  <div class="tab-content active" data-tab-content="logs">
+    <div class="controls-row">
+      <input class="search-input" type="text" placeholder="Search logs">
+      <div class="controls-right">
+        <button class="ctrl-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Last 30 mins
+        </button>
+        <button class="ctrl-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+          Filter
+        </button>
+        <div class="segment-ctrl">
+          <button class="segment-btn active">Traces</button>
+          <button class="segment-btn">Sessions</button>
+        </div>
+      </div>
+    </div>
+    <div class="status-row">
+      <div>Showing 22 traces &nbsp; <span class="set-limit">Set limit</span></div>
+      <div style="display:flex;align-items:center;gap:4px;cursor:pointer">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        View graph
+      </div>
+    </div>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:28px"><input type="checkbox"></th>
+            <th>Name <span class="sort-icon">↕</span></th>
+            <th>Input</th>
+            <th>Output</th>
+            <th>Model</th>
+            <th class="col-mcp">MCP Tool</th>
+            <th style="text-align:right">Tokens <span class="sort-icon">↕</span></th>
+            <th style="text-align:right">Cost <span class="sort-icon">↕</span></th>
+            <th style="text-align:right">Latency <span class="sort-icon">↕</span></th>
+            <th>Tags</th>
+          </tr>
+        </thead>
+        <tbody id="logTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ═══ ALERTS TAB ═══ -->
+  <div class="tab-content" data-tab-content="alerts">
+    <div style="padding:60px 20px;text-align:center;color:var(--text-tertiary)">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:12px;opacity:0.4"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <div style="font-size:14px;font-weight:500;color:var(--text-secondary);margin-bottom:4px">No alerts configured</div>
+      <div style="font-size:12px">Set up alerts to monitor cost thresholds and error rates.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ Trace Detail Panel ═══ -->
+<div class="trace-overlay" id="traceOverlay" onclick="closeTrace(event)">
+  <div class="trace-panel" onclick="event.stopPropagation()">
+    <div class="trace-header">
+      <div class="trace-header-top">
+        <div>
+          <div class="trace-title" id="traceTitle">Trace (7.39s)</div>
+          <div class="trace-id" id="traceId">d7f5dee5-4c74-47b8-84e8-1d998339</div>
+        </div>
+        <div class="trace-actions">
+          <button class="trace-action-btn">Copy ID</button>
+          <button class="trace-action-btn">Share</button>
+          <button class="trace-close" onclick="closeTrace()">&times;</button>
+        </div>
+      </div>
+    </div>
+    <div class="trace-tabs-inner">
+      <div class="trace-tab active">Details</div>
+      <div class="trace-tab">Evaluation</div>
+    </div>
+    <div class="trace-body">
+      <div class="trace-spans">
+        <input class="trace-spans-search" type="text" placeholder="Type at least 4 characters to search">
+        <div id="spanTree"></div>
+      </div>
+      <div class="trace-details" id="traceDetails"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const logData = [
+  { name:'bifrost_responses_stream', input:'{"annotations":null,"logprobs":...', output:'"Done! I created a **\\"Beacon Landin...', model:'claude-opus-4', provider:'anthropic', tokens:73886, cost:0.375050, latency:7389, tags:'claude-opus-4-6', mcpTool:'write_html', mcpServer:'Paper.design', mcpClass:'paper', toolArgs:'paper-write_html({nodeId:"8A-0", format:"inline-styles"})' },
+  { name:'bifrost_responses_stream', input:'{"annotations":null,"logprobs":...', output:'"The nav button and logo look correc...', model:'claude-opus-4', provider:'anthropic', tokens:73591, cost:0.369375, latency:3842, tags:'claude-opus-4-6', mcpTool:'get_screenshot', mcpServer:'Paper.design', mcpClass:'paper', toolArgs:'paper-get_screenshot({nodeId:"8A-0", scale:1})' },
+  { name:'bifrost_responses_stream', input:'{"annotations":null,"logprobs":...', output:'"Looks great! The dark mode version...', model:'claude-opus-4', provider:'anthropic', tokens:73316, cost:0.369080, latency:7270, tags:'claude-opus-4-6', mcpTool:'update_styles', mcpServer:'Paper.design', mcpClass:'paper', toolArgs:'paper-update_styles({updates:[{nodeIds:["9N-0"], styles:{backgroundColor:"#0F172A"}}]})' },
+  { name:'bifrost_responses_stream', input:'{"content":null,"logprobs":...', output:'"Found matching files in repository...', model:'claude-opus-4', provider:'anthropic', tokens:72800, cost:0.371200, latency:5120, tags:'claude-opus-4-6', mcpTool:'search_code', mcpServer:'GitHub', mcpClass:'github', toolArgs:'github-search_code({query:"MCP gateway handler", repo:"maximhq/bifrost"})' },
+  { name:'bifrost_responses_stream', input:'{"arguments":{"file_path":"...', output:'"/tmp/beacon_dark.jpg","call_id":"toolu_01...', model:'claude-opus-4', provider:'anthropic', tokens:72671, cost:0.364555, latency:2916, tags:'claude-opus-4-6', mcpTool:'get_fill_image', mcpServer:'Paper.design', mcpClass:'paper', toolArgs:'paper-get_fill_image({nodeId:"1-0"})' },
+  { name:'bifrost_responses_stream', input:'{"arguments":{"command":"cat...', output:'"/Users/reehan/claude/projects/...', model:'claude-opus-4', provider:'anthropic', tokens:72482, cost:0.368570, latency:12158, tags:'claude-opus-4-6', mcpTool:'get_tree_summary', mcpServer:'Paper.design', mcpClass:'paper', toolArgs:'paper-get_tree_summary({nodeId:"8A-0", depth:6})' },
+  { name:'bifrost_responses_stream', input:'{"content":null,"logprobs":...', output:'"PR #2041 created successfully...', model:'claude-opus-4', provider:'anthropic', tokens:72100, cost:0.365400, latency:4830, tags:'claude-opus-4-6', mcpTool:'create_pull_request', mcpServer:'GitHub', mcpClass:'github', toolArgs:'github-create_pull_request({title:"Fix goroutine leak", base:"main"})' },
+  { name:'bifrost_responses_stream', input:'{"content":null,"logprobs":...', output:'"The screenshot was captured. Let ...', model:'claude-opus-4', provider:'anthropic', tokens:72046, cost:0.368570, latency:5735, tags:'claude-opus-4-6', mcpTool:'get_screenshot', mcpServer:'Paper.design', mcpClass:'paper', toolArgs:'paper-get_screenshot({nodeId:"9N-0", scale:1})' },
+  { name:'bifrost_responses_stream', input:'{"arguments":{"command":"...', output:'"/Users/reehan/claude/projects/...', model:'claude-opus-4', provider:'anthropic', tokens:71595, cost:0.363835, latency:5657, tags:'claude-opus-4-6', mcpTool:'write_html', mcpServer:'Paper.design', mcpClass:'paper', toolArgs:'paper-write_html({html:"<div>...", target:"9N-0"})' },
+  { name:'bifrost_count_tokens', input:'', output:'', model:'claude-opus-4', provider:'anthropic', tokens:0, cost:null, latency:459, tags:'claude-opus-4-6', mcpTool:null, mcpServer:null, mcpClass:null, toolArgs:null },
+  { name:'bifrost_responses_stream', input:'{"annotations":null,"logprobs":...', output:'"Deploy completed. Status: healthy...', model:'claude-opus-4', provider:'anthropic', tokens:70900, cost:0.360100, latency:3890, tags:'claude-opus-4-6', mcpTool:'run_deploy', mcpServer:'internal-deploy-tools', mcpClass:'internal', toolArgs:'deploy-run_deploy({env:"staging", service:"bifrost-gateway"})' },
+  { name:'bifrost_responses_stream', input:'{"annotations":null,"logprobs":...', output:'"Let me get the styles of the key e...', model:'claude-opus-4', provider:'anthropic', tokens:70745, cost:0.358645, latency:3295, tags:'claude-opus-4-6', mcpTool:'get_tree_summary', mcpServer:'Paper.design', mcpClass:'paper', toolArgs:'paper-get_tree_summary({nodeId:"8A-0", depth:4})' },
+  { name:'bifrost_responses_stream', input:'{"annotations":null,"logprobs":...', output:'"...', model:'claude-opus-4', provider:'anthropic', tokens:70574, cost:0.358750, latency:6582, tags:'claude-opus-4-6', mcpTool:'update_styles', mcpServer:'Paper.design', mcpClass:'paper', toolArgs:'paper-update_styles({updates:[{nodeIds:["AA-0"], styles:{backgroundImage:"..."}}]})' },
+  { name:'bifrost_responses_stream', input:'{"annotations":null,"logprobs":...', output:'"Found it — Beacon Landing Page...', model:'claude-opus-4', provider:'anthropic', tokens:70210, cost:0.356200, latency:4120, tags:'claude-opus-4-6', mcpTool:'write_html', mcpServer:'Paper.design', mcpClass:'paper', toolArgs:'paper-write_html({html:"<div>...", target:"8A-0"})' },
+];
+
+let currentMode = 'current';
+
+function setMode(mode) {
+  currentMode = mode;
+  document.querySelectorAll('.view-toggle-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+  document.getElementById('mainContent').classList.toggle('proposed', mode === 'proposed');
+  renderTable();
+}
+
+function switchTab(tabName) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tabName));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.dataset.tabContent === tabName));
+}
+
+function renderTable() {
+  const tbody = document.getElementById('logTable');
+  tbody.innerHTML = logData.map((row, i) => `
+    <tr onclick="openTrace(${i})">
+      <td><input type="checkbox" onclick="event.stopPropagation()"></td>
+      <td><div class="cell-name cell-truncate">${row.name}</div></td>
+      <td><div class="cell-truncate cell-muted" style="max-width:150px">${row.input || '—'}</div></td>
+      <td><div class="cell-truncate cell-muted" style="max-width:150px">${row.output || '—'}</div></td>
+      <td><span class="model-badge"><span class="model-icon ${row.provider}">${row.provider==='anthropic'?'A':'O'}</span>${row.model}</span></td>
+      ${currentMode === 'proposed' ? `<td class="col-mcp">${row.mcpTool
+        ? `<span class="mcp-tool-pill ${row.mcpClass}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>${row.mcpTool}</span><span class="mcp-server-label">${row.mcpServer}</span>`
+        : '<span class="cell-muted">—</span>'}</td>` : ''}
+      <td class="cell-mono" style="text-align:right">${row.tokens.toLocaleString()}</td>
+      <td class="cell-cost">${row.cost!==null ? '$'+row.cost.toFixed(6) : '<span class="cell-muted">N/A</span>'}</td>
+      <td class="cell-mono" style="text-align:right">${row.latency.toLocaleString()} ms</td>
+      <td><span class="tag-pill"><span class="tag-key">model</span> ${row.tags}</span></td>
+    </tr>
+  `).join('');
+}
+
+function openTrace(index) {
+  const row = logData[index];
+  const dur = (row.latency / 1000).toFixed(2);
+  document.getElementById('traceTitle').textContent = `Trace (${dur}s)`;
+  document.getElementById('traceId').textContent = `${row.name.slice(0,8)}-${Math.random().toString(36).substr(2,4)}-${Math.random().toString(36).substr(2,4)}-${Math.random().toString(36).substr(2,12)}`;
+
+  let mcpSpanHtml = '';
+  if (row.mcpTool) {
+    mcpSpanHtml = `
+      <div class="span-mcp-new">
+        <div class="span-item pulse-new" style="margin-bottom:4px">
+          <div class="span-left">
+            <span class="span-expand">▼</span>
+            <span class="span-icon mcp">⚡</span>
+            <span class="span-name">MCP: ${row.mcpServer} / ${row.mcpTool}</span>
+          </div>
+          <div class="span-right">${dur}s</div>
+        </div>
+      </div>`;
+  }
+
+  document.getElementById('spanTree').innerHTML = `
+    ${mcpSpanHtml}
+    <div style="${row.mcpTool && currentMode==='proposed' ? 'padding-left:18px' : ''}">
+      <div class="span-item active">
+        <div class="span-left">
+          <span class="span-expand">▼</span>
+          <span class="span-icon completion">C</span>
+          <span class="span-name">bifrost_chat_completion</span>
+          <span class="span-meta"><span>${row.tokens.toLocaleString()}</span><span>·</span><span>${row.cost!==null?'$'+row.cost.toFixed(4):'N/A'}</span></span>
+        </div>
+        <div class="span-right">${dur}s</div>
+      </div>
+      <div class="span-children">
+        <div class="span-item">
+          <div class="span-left">
+            <span class="span-expand" style="visibility:hidden">▶</span>
+            <span class="span-icon llm">L</span>
+            <span class="span-name">LLM call</span>
+          </div>
+          <div class="span-right">${dur}s</div>
+        </div>
+      </div>
+    </div>`;
+
+  const now = new Date();
+  const start = new Date(now - row.latency);
+
+  document.getElementById('traceDetails').innerHTML = `
+    <div class="trace-detail-type">bifrost_chat_completion</div>
+    <div class="trace-detail-row">
+      <div><div class="trace-detail-label">Start Timestamp</div><div class="trace-detail-value" style="font-size:12px">${start.toISOString().replace('T',' ').slice(0,19)} (+05:30)</div></div>
+      <div><div class="trace-detail-label">End Timestamp</div><div class="trace-detail-value" style="font-size:12px">${now.toISOString().replace('T',' ').slice(0,19)} (+05:30)</div></div>
+    </div>
+    <div class="trace-detail-row">
+      <div><div class="trace-detail-label">Total Cost</div><div class="trace-detail-value">${row.cost!==null?'$'+row.cost.toFixed(6):'N/A'}</div></div>
+      <div><div class="trace-detail-label">Total Tokens</div><div class="trace-detail-value">${row.tokens.toLocaleString()}</div></div>
+      <div><div class="trace-detail-label">Latency</div><div class="trace-detail-value">${dur}s</div></div>
+    </div>
+    <div class="trace-section-label">Tags</div>
+    <div class="trace-tags">
+      <span class="tag-pill"><span class="tag-key">model</span> ${row.tags}</span>
+      ${row.mcpTool && currentMode==='proposed' ? `<span class="tag-pill" style="background:var(--bg-muted);color:var(--text-secondary)"><span class="tag-key">mcp_tool</span> ${row.mcpTool}</span><span class="tag-pill" style="background:var(--bg-muted);color:var(--text-secondary)"><span class="tag-key">mcp_server</span> ${row.mcpServer}</span>` : ''}
+    </div>
+    ${row.mcpTool ? `
+    <div class="trace-mcp-attribution">
+      <div class="trace-mcp-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        MCP Cost Attribution
+      </div>
+      <div class="trace-mcp-grid">
+        <div class="trace-mcp-field"><div class="trace-mcp-field-label">MCP Tool</div><div class="trace-mcp-field-value">${row.mcpTool}</div></div>
+        <div class="trace-mcp-field"><div class="trace-mcp-field-label">MCP Server</div><div class="trace-mcp-field-value">${row.mcpServer}</div></div>
+        <div class="trace-mcp-field"><div class="trace-mcp-field-label">Attributed LLM Cost</div><div class="trace-mcp-field-value" style="color:var(--text-primary)">$${row.cost?row.cost.toFixed(4):'0.00'}</div></div>
+        <div class="trace-mcp-field"><div class="trace-mcp-field-label">Tool Execution</div><div class="trace-mcp-field-value">${Math.floor(Math.random()*300+100)}ms</div></div>
+        <div class="trace-mcp-field"><div class="trace-mcp-field-label">Session Share</div><div class="trace-mcp-field-value">${row.cost?((row.cost/4.42)*100).toFixed(1):'0'}%</div></div>
+        <div class="trace-mcp-field"><div class="trace-mcp-field-label">Tool Call Args</div><div class="trace-mcp-field-value" style="font-size:10px;word-break:break-all">${row.toolArgs||'—'}</div></div>
+      </div>
+    </div>` : ''}
+    <div class="trace-section-label">Input</div>
+    <div class="trace-content-block">${row.input || '(empty)'}</div>
+    <div class="trace-section-label">Output</div>
+    <div class="trace-content-block">${row.output || '(empty)'}</div>`;
+
+  document.getElementById('traceOverlay').classList.add('open');
+}
+
+function closeTrace(event) {
+  if (event && event.target !== document.getElementById('traceOverlay')) return;
+  document.getElementById('traceOverlay').classList.remove('open');
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeTrace(); });
+renderTable();
+</script>
+</body>
+</html>

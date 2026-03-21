@@ -1,327 +1,592 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bifrost Product Evaluation — A Technical PM's Assessment</title>
-    <meta name="description" content="Hands-on product evaluation of Bifrost, Maxim AI's open-source LLM and MCP gateway. Systematic testing, friction analysis, and prioritized product recommendations.">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Bifrost: LLM & MCP Gateway evaluation</title>
+<meta name="description" content="Hands-on product evaluation of Bifrost, Maxim AI's open-source LLM and MCP gateway. Systematic testing, friction analysis, and prioritized product recommendations."/>
+<meta property="og:title" content="Bifrost Product Evaluation | Reehan Ahmed"/>
+<meta property="og:description" content="Hands-on evaluation of Bifrost v1.4.14: MCP cost attribution gap, agent reliability analysis, and prioritized recommendations."/>
+<meta property="og:type" content="article"/>
 
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;0,6..72,800;1,6..72,400;1,6..72,500&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..800;1,6..72,300..800&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
 
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#0D9488',
-                        accent: '#2DD4BF',
-                        cream: '#F8F5F0',
-                        'cream-dark': '#F0EDE7',
-                    },
-                    fontFamily: {
-                        display: ['Newsreader', 'Georgia', 'serif'],
-                        body: ['DM Sans', 'system-ui', 'sans-serif'],
-                        mono: ['JetBrains Mono', 'monospace'],
-                    },
-                },
-            },
-        }
-    </script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        "primary": "#0D9488",
+        "accent": "#2DD4BF",
+        "cream": "#F8F5F0",
+        "cream-dark": "#F0EDE7",
+      },
+      fontFamily: {
+        "display": ["Newsreader", "Georgia", "Times New Roman", "serif"],
+        "body": ["DM Sans", "system-ui", "-apple-system", "sans-serif"],
+        "mono": ["JetBrains Mono", "SF Mono", "Menlo", "monospace"],
+      },
+    },
+  },
+}
+</script>
 
-    <style>
-        body { font-family: 'DM Sans', system-ui, sans-serif; background-color: #F8F5F0; }
-        h1, h2, h3 { font-family: 'Newsreader', Georgia, serif; }
-        code, .font-mono { font-family: 'JetBrains Mono', monospace; }
+<style>
+  html { scroll-behavior: smooth; }
+  body { font-family: 'DM Sans', system-ui, sans-serif; background: #F8F5F0; }
 
-        /* Section reveal animation */
-        .section-reveal {
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
-        }
-        .section-reveal.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #a1a1aa44; border-radius: 3px; }
 
-        /* Scroll progress */
-        #progress-bar {
-            transform-origin: left;
-            transform: scaleX(0);
-            transition: transform 0.1s linear;
-        }
+  ::selection { background: #2dd4bf33; }
 
-        /* ToC active state */
-        .toc-link.active {
-            color: #0D9488;
-            font-weight: 600;
-        }
+  .section-card {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .section-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
 
-        /* Reduced motion */
-        @media (prefers-reduced-motion: reduce) {
-            .section-reveal { opacity: 1; transform: none; transition: none; }
-        }
+  @media (prefers-reduced-motion: reduce) {
+    .section-card { opacity: 1; transform: none; transition: none; }
+    html { scroll-behavior: auto; }
+  }
 
-        /* Print styles */
-        @media print {
-            .no-print { display: none !important; }
-            .section-reveal { opacity: 1; transform: none; }
-            body { background: white; }
-        }
-    </style>
+  #scroll-bar { transition: width 0.1s linear; }
+
+  a:focus-visible, button:focus-visible {
+    outline: 2px solid #0D9488;
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  table { border-collapse: collapse; width: 100%; }
+  th {
+    text-align: left;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #52525b;
+    padding: 7px 10px;
+    border-bottom: 2px solid #d4d4d8;
+  }
+  td {
+    padding: 7px 10px;
+    font-size: 14px;
+    color: #27272a;
+    border-bottom: 1px solid #e4e4e7;
+  }
+  tr:last-child td { border-bottom: none; }
+  td.highlight { color: #0D9488; font-weight: 600; }
+
+  .chart-img {
+    width: 100%;
+    border-radius: 8px;
+    border: 1px solid #d4d4d8;
+  }
+
+  .toc-link {
+    position: relative;
+    padding-left: 12px;
+    border-left: 2px solid transparent;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .toc-link.active {
+    color: #0D9488;
+    border-left-color: #0D9488;
+  }
+
+  .insight-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: 6px;
+    background: #f0fdfa;
+    border: 1px solid #99f6e4;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    color: #0f766e;
+  }
+
+  .severity-critical {
+    background: #fef2f2;
+    border-color: #fecaca;
+    color: #991b1b;
+  }
+
+  .severity-high {
+    background: #fffbeb;
+    border-color: #fde68a;
+    color: #92400e;
+  }
+
+  @media print {
+    .no-print { display: none !important; }
+    .section-card { opacity: 1; transform: none; }
+    body { background: white; }
+  }
+</style>
 </head>
+
 <body class="text-zinc-800 antialiased">
 
-    <!-- Sticky Header -->
-    <header class="no-print sticky top-0 z-50 bg-cream/80 backdrop-blur-md border-b border-zinc-200/60">
-        <div class="max-w-3xl mx-auto px-6 py-3 flex items-center justify-between">
-            <span class="font-mono text-xs text-zinc-500 tracking-wide uppercase">Bifrost Evaluation</span>
-            <span class="font-mono text-xs text-zinc-400">v1.4.14 · March 2026</span>
-        </div>
-        <div id="progress-bar" class="h-0.5 bg-primary"></div>
-    </header>
-
-    <!-- ToC Sidebar (xl screens) -->
-    <nav class="no-print hidden xl:block fixed top-24 text-sm" style="left: calc(50% + 420px); width: 200px;">
-        <p class="font-mono text-xs text-zinc-400 uppercase tracking-wider mb-3">Contents</p>
-        <ul class="space-y-2">
-            <li><a href="#tldr" class="toc-link text-zinc-500 hover:text-primary transition-colors">TL;DR</a></li>
-            <li><a href="#methodology" class="toc-link text-zinc-500 hover:text-primary transition-colors">Methodology</a></li>
-            <li><a href="#strengths" class="toc-link text-zinc-500 hover:text-primary transition-colors">Where Bifrost Wins</a></li>
-            <li><a href="#opportunities" class="toc-link text-zinc-500 hover:text-primary transition-colors">Product Opportunities</a></li>
-            <li><a href="#improvements" class="toc-link text-zinc-500 hover:text-primary transition-colors">What I'd Improve</a></li>
-            <li><a href="#forward" class="toc-link text-zinc-500 hover:text-primary transition-colors">Forward-Looking</a></li>
-            <li><a href="#about" class="toc-link text-zinc-500 hover:text-primary transition-colors">About</a></li>
-        </ul>
+<!-- Header -->
+<header class="no-print sticky top-0 z-50 border-b border-zinc-300/50 bg-[#F8F5F0]/92 backdrop-blur-md">
+  <div id="scroll-bar" class="h-[2px] bg-primary" style="width:0%"></div>
+  <div class="max-w-3xl mx-auto px-5 py-3 flex items-center justify-between">
+    <span class="font-display text-[15px] font-semibold tracking-tight text-zinc-900">Bifrost Exploration</span>
+    <nav class="hidden md:flex items-center gap-0.5" aria-label="Page sections">
+      <a href="#recommendations" class="px-3 py-2 rounded-md text-[11px] font-mono font-medium text-zinc-500 hover:text-primary hover:bg-primary/5 transition-colors">Recommendations</a>
+      <span class="text-zinc-300 text-[10px]" aria-hidden="true">/</span>
+      <a href="#strengths" class="px-3 py-2 rounded-md text-[11px] font-mono font-medium text-zinc-500 hover:text-primary hover:bg-primary/5 transition-colors">Strengths</a>
+      <span class="text-zinc-300 text-[10px]" aria-hidden="true">/</span>
+      <a href="#methodology" class="px-3 py-2 rounded-md text-[11px] font-mono font-medium text-zinc-500 hover:text-primary hover:bg-primary/5 transition-colors">Methodology</a>
+      <span class="text-zinc-300 text-[10px]" aria-hidden="true">/</span>
+      <a href="#about" class="px-3 py-2 rounded-md text-[11px] font-mono font-medium text-zinc-500 hover:text-primary hover:bg-primary/5 transition-colors">About</a>
     </nav>
+    <a href="https://github.com/R-eehan/bifrost-product-evaluation" target="_blank" rel="noopener noreferrer" class="px-3 py-2 rounded-md text-[11px] font-mono font-medium text-zinc-500 hover:text-primary hover:bg-primary/5 transition-colors" aria-label="View source code on GitHub">GitHub</a>
+  </div>
+</header>
 
-    <!-- Main Content -->
-    <main class="max-w-3xl mx-auto px-6 py-12 space-y-6">
+<!-- Table of Contents (right sidebar, wide screens only) -->
+<aside class="no-print hidden xl:block fixed z-40" style="top: 120px; left: calc(50% + 420px);" aria-label="Table of contents">
+  <nav class="space-y-1">
+    <p class="font-mono text-[9px] font-semibold uppercase tracking-[0.15em] text-zinc-400 mb-3">On this page</p>
+    <a href="#recommendations" class="toc-link block text-[12px] font-mono text-zinc-400 hover:text-primary py-1" data-toc="recommendations">What I'd improve</a>
+    <a href="#strengths" class="toc-link block text-[12px] font-mono text-zinc-400 hover:text-primary py-1" data-toc="strengths">Where Bifrost wins</a>
+    <a href="#methodology" class="toc-link block text-[12px] font-mono text-zinc-400 hover:text-primary py-1" data-toc="methodology">Methodology</a>
+    <a href="#about" class="toc-link block text-[12px] font-mono text-zinc-400 hover:text-primary py-1" data-toc="about">About</a>
+  </nav>
+</aside>
 
-        <!-- Hero -->
-        <section class="section-reveal text-center py-8">
-            <h1 class="text-4xl md:text-5xl font-display font-700 text-zinc-900 leading-tight mb-4">
-                Bifrost Product Evaluation
-            </h1>
-            <p class="text-xl font-display text-zinc-600 italic mb-6">
-                A Technical PM's Assessment
-            </p>
-            <div class="flex items-center justify-center gap-4 text-sm text-zinc-500 font-mono">
-                <span>Reehan Ahmed</span>
-                <span class="text-zinc-300">·</span>
-                <span>March 2026</span>
-                <span class="text-zinc-300">·</span>
-                <span>Bifrost v1.4.14</span>
+<!-- Hero -->
+<section class="max-w-3xl mx-auto px-5 pt-8 pb-5 md:pt-12 md:pb-8">
+  <p class="font-mono text-[11px] font-medium uppercase tracking-[0.15em] text-primary mb-2">Product Evaluation</p>
+  <h1 class="font-display text-3xl sm:text-4xl md:text-[38px] font-semibold tracking-tight text-zinc-900 leading-[1.15] mb-1">
+    Bifrost: LLM & MCP Gateway evaluation
+  </h1>
+  <p class="text-[13px] text-zinc-500 font-mono mb-5">Reehan Ahmed &middot; March 2026 &middot; Bifrost v1.4.14</p>
+
+  <div class="space-y-2.5 text-[15px] text-zinc-700 leading-[1.65] max-w-2xl">
+    <p>
+      I evaluated Bifrost through two lenses:
+    </p>
+    <p>
+      <strong class="text-zinc-900">First, as an AI gateway:</strong> routing, observability, and developer experience. I routed Claude Code through the Bifrost CLI, wrote test scripts for multi-provider routing and auto-capture observability, and logged friction points along the way.
+    </p>
+    <p>
+      <strong class="text-zinc-900">Second, through an enterprise business case:</strong> Imagine a Product Design leader at a large enterprise company evaluating a AI native design tool - <a href="https://paper.design/" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline underline-offset-2">Paper.design</a> (a Figma alternative that speaks MCP) for a team of 20 Product Designers. This organization already uses Claude Code and the Designers will increase Claude Code usage using Paper.design. They want to pilot with 5 designers first. For a successful purchase, the Design leader would need to have clarity & visibility into a key question - <strong class="text-zinc-900">what will this cost per tool, per designer, per month?</strong>
+    </p>
+    <p>
+      I used Bifrost's MCP gateway to run exactly that pilot. My findings: The gateway works but <strong class="text-zinc-900">the answer to the cost question was difficult to arrive at.</strong>
+    </p>
+    <p>
+      Three product recommendations follow, ordered by strategic impact:
+    </p>
+  </div>
+
+  <div class="mt-3 p-3 rounded-lg bg-amber-50/80 border border-amber-300/50">
+    <p class="text-[13px] text-amber-900 leading-relaxed">
+      <strong>Note:</strong> Test scripts, research, GitHub issue analysis, and computational work were done in collaboration with Claude Code. Evaluation design, business case framing, product analysis, and prioritization were done by the author. The evaluation itself was run through Bifrost, making this a case of using AI tools to evaluate AI infrastructure. Full methodology, limitations & what was NOT tested are <a href="#methodology" class="text-amber-800 underline underline-offset-2 hover:text-amber-950">documented below</a>.
+    </p>
+  </div>
+</section>
+
+<main class="max-w-3xl mx-auto px-5 pb-12 space-y-6">
+
+<!-- ═══ WHAT I'D IMPROVE ═══ -->
+<section id="recommendations" class="section-card">
+  <div class="bg-white border border-zinc-200/80 rounded-xl shadow-sm overflow-hidden">
+    <div class="p-5 md:p-6">
+      <p class="font-mono text-[10px] font-semibold uppercase tracking-[0.15em] text-primary mb-2">Priority 01</p>
+      <h2 class="font-display text-xl md:text-2xl font-semibold tracking-tight text-zinc-900 mb-4">MCP cost attribution, the unsolved problem</h2>
+
+      <div class="space-y-2.5 text-[15px] text-zinc-700 leading-[1.6] mb-4">
+        <p>
+          Looking at the enteprise business case: a Product Design leader running a Paper.design pilot through Bifrost's MCP gateway can view MCP tool calls in Bifrost. They can also see that the session cost $0.53 in LLM spend. What they can't see is <strong class="text-zinc-900">which tools drove which costs.</strong>
+        </p>
+        <p>
+          Bifrost's MCP gateway captures tool calls but so do <a href="https://portkey.ai/docs/product/mcp-gateway#mcp-gateway" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline underline-offset-2">Portkey</a> & <a href="https://docs.litellm.ai/docs/mcp" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline underline-offset-2">LiteLLM</a>. LiteLLM has gone a step further with <a href="https://docs.litellm.ai/docs/mcp_cost" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline underline-offset-2">manual per-tool cost assignment</a>, where you predefine a fixed cost per tool call in config. This validates a market need. But <strong class="text-zinc-900">nobody has solved automated LLM cost attribution yet</strong>, where actual token spend is traced back to the tool call that triggered it.
+        </p>
+        <p>
+          I verified this across three layers:
+        </p>
+      </div>
+
+      <figure class="mb-4">
+        <img src="images/mcp-logs-zero-cost.png" alt="Bifrost MCP Logs page showing 11 tool calls with Total Cost: $0.0000 and every row displaying N/A in the Cost column" class="w-full rounded-lg border border-zinc-200 shadow-sm"/>
+        <figcaption class="text-[11px] text-zinc-500 font-mono mt-2 text-center">Bifrost MCP Logs: 11 tool calls, 100% success rate, Total Cost: $0.0000. Every row shows "N/A" in the Cost column. The $0.53 in LLM spend that powered these calls is invisible here.</figcaption>
+      </figure>
+
+      <div class="overflow-x-auto mb-4">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Layer</th>
+              <th scope="col">What it shows</th>
+              <th scope="col">MCP cost visible?</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Bifrost MCP Logs</td><td>11 tool calls, $0.00 total cost</td><td>No</td></tr>
+            <tr><td>Bifrost LLM Logs</td><td>$0.53 total for the session</td><td>No. Cost isn't linked to which tool triggered it</td></tr>
+            <tr><td>Maxim Traces</td><td>Tool calls visible as <code class="font-mono text-[12px] bg-zinc-100 px-1 rounded">function_call</code> in output</td><td>No. Buried in raw JSON, no per-tool cost span</td></tr>
+            <tr><td>Bifrost SQLite schema</td><td><code class="font-mono text-[12px] bg-zinc-100 px-1 rounded">mcp_tool_logs.llm_request_id</code> column exists</td><td class="highlight">The foreign key is designed but NULL</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="space-y-2.5 text-[15px] text-zinc-700 leading-[1.6] mb-4">
+        <p>
+          A developer looking at MCP Logs thinks "free." An engineering leader looking at LLM Logs sees "$0.53" but can't tell which tool caused it. Neither layer tells the full story.
+        </p>
+        <p>
+          Upon exploring the code, it seems like the infrastructure for this is already partially built. The <code class="font-mono text-[12px] bg-zinc-100 px-1 rounded">llm_request_id</code> column exists in <code class="font-mono text-[12px] bg-zinc-100 px-1 rounded">mcp_tool_logs</code>. So the correlation exists, but doesn't seem like it was populated. From the outside in, the foundation already exists.
+        </p>
+      </div>
+
+      <!-- Where it should live -->
+      <div class="bg-[#F8F5F0] rounded-lg border border-zinc-200/80 p-4 mb-4">
+        <h3 class="font-mono text-[11px] font-semibold uppercase tracking-[0.1em] text-primary mb-3">Where this should live</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div>
+            <p class="text-[13px] font-semibold text-zinc-900 mb-1">Bifrost (free)</p>
+            <p class="text-[13px] text-zinc-600 leading-[1.5]">Populate <code class="font-mono text-[11px] bg-white px-1 rounded">llm_request_id</code> in <code class="font-mono text-[11px] bg-white px-1 rounded">mcp_tool_logs</code>. Show basic per-tool metrics: call count, latency, success rate. Surface a signal: "11 tool calls from Paper.design. See cost impact in Maxim."</p>
+          </div>
+          <div>
+            <p class="text-[13px] font-semibold text-zinc-900 mb-1">Maxim (paid)</p>
+            <p class="text-[13px] text-zinc-600 leading-[1.5]">Enriched trace view with MCP tool calls as child spans with attributed cost. Per-tool LLM cost dashboard. Team-level projections and budget alerts.</p>
+          </div>
+        </div>
+        <p class="text-[13px] text-zinc-600 mt-3 pt-3 border-t border-zinc-200/60">The free tier makes the problem visible. The paid tier aims to answer/connect the dots.</p>
+      </div>
+
+      <!-- Decision-making gap -->
+      <div class="space-y-2.5 text-[15px] text-zinc-700 leading-[1.6] mb-4">
+        <p>
+          <strong class="text-zinc-900">The key problem statement: How does the Product Design lead make a conscious decision?</strong> Without per-tool cost attribution, a team running & using MCP tools can't answer basic questions: Which MCP servers are worth the cost? Which tools should have budgets? Where are the runaway costs before they hit finance's radar?
+        </p>
+        <p>
+          At enterprise scale, the numbers compound. Based on my runs - a single Paper.design session cost me $0.53 in LLM spend. A team of 50 developers/designers using 3 MCP servers daily pushes this cost past ~$15,000/year, all invisible. <strong class="text-zinc-900">MCP tools' impact on LLM spend is invisible today and it seems nobody has solved it so far</strong>.
+        </p>
+      </div>
+
+      <!-- Code Mode -->
+      <div class="bg-[#F8F5F0] rounded-lg border border-zinc-200/80 p-4 mb-4">
+        <h3 class="font-mono text-[11px] font-semibold uppercase tracking-[0.1em] text-primary mb-2">Code Mode: cost optimization without cost measurement</h3>
+        <p class="text-[13px] text-zinc-600 leading-[1.5] mb-3">
+          Bifrost's Code Mode claims 50% token reduction for multi-server setups by replacing MCP tool schemas with 4 meta-tools. The 50% claim targets setups with 3+ servers and 150+ tools. But Bifrost provides <strong class="text-zinc-900">no built-in way to measure whether Code Mode is working.</strong> No "saved you X tokens this session" metric anywhere in the dashboard. Without measurement or baseline establishment, Code Mode's core value proposition feels diminished.
+        </p>
+        <div class="overflow-x-auto">
+          <table>
+            <thead><tr><th scope="col">Metric</th><th scope="col">Classic Mode</th><th scope="col">Code Mode</th><th scope="col">Delta</th></tr></thead>
+            <tbody>
+              <tr><td>Cost per request</td><td>$0.065</td><td>$0.067</td><td>+3% (no savings)</td></tr>
+              <tr><td>Avg prompt tokens/request</td><td>57,776</td><td>60,621</td><td>+5% (worse)</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-[12px] text-zinc-500 mt-2">The above results are with just 1 server / 19 tools, below the recommended 3+ servers / 150+ tools where cost reduction becomes real. The baseline & improvement measurement gap identified still applies here.</p>
+      </div>
+
+      <div class="flex items-center gap-3 mb-2">
+        <a href="prototype-mcp-cost-attribution-v2.html" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/5 border border-primary/20 text-[13px] font-medium text-primary hover:bg-primary/10 transition-colors">
+          See prototype: MCP Cost Attribution Concept →
+        </a>
+      </div>
+
+      <blockquote class="font-display italic text-[16px] text-primary border-l-[3px] border-primary/30 pl-4 mt-4">
+        Being able to attribute cost enables two things: allows MCP tool call cost contribution visibility AND makes it possible to validate whether Bifrost's own cost optimization feature - Code Mode is delivering value.
+      </blockquote>
+    </div>
+  </div>
+</section>
+
+<!-- Priority 2 -->
+<section class="section-card">
+  <div class="bg-white border border-zinc-200/80 rounded-xl shadow-sm overflow-hidden">
+    <div class="p-5 md:p-6">
+      <p class="font-mono text-[10px] font-semibold uppercase tracking-[0.15em] text-primary mb-2">Priority 02</p>
+      <h2 class="font-display text-xl md:text-2xl font-semibold tracking-tight text-zinc-900 mb-4">Agent reliability on agentic workloads</h2>
+
+      <div class="space-y-2.5 text-[15px] text-zinc-700 leading-[1.6] mb-4">
+        <p>
+          Bifrost positions itself as agent infrastructure: "Launch any coding agent through Bifrost." The default configuration and CLI tooling both revealed gaps during my test runs.
+        </p>
+      </div>
+
+      <div class="bg-[#F8F5F0] rounded-lg border border-zinc-200/80 p-4 mb-4">
+        <h3 class="font-mono text-[11px] font-semibold uppercase tracking-[0.1em] text-zinc-600 mb-3">Reliability</h3>
+        <ul class="space-y-2 text-[14px] text-zinc-700 leading-[1.6]">
+          <li>
+            <strong class="text-zinc-900">HTTP 500 errors and timeouts</strong> during extended Claude Code sessions run via the </strong> <a href="https://docs.getbifrost.ai/quickstart/cli/getting-started" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline underline-offset-2">Bifrost CLI</a>. Root cause: goroutine leaks on context cancellation (<a href="https://github.com/maximhq/bifrost/issues/828" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline underline-offset-2">#828</a>, open 5 months) plus a default timeout of 30 seconds (<a href="https://github.com/maximhq/bifrost/issues/1157" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline underline-offset-2">#1157</a>, <a href="https://github.com/maximhq/bifrost/issues/1406" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline underline-offset-2">#1406</a>). A 30-second timeout on a product built for multi-minute agentic tool chains. That's a mismatch between positioning and defaults.
+          </li>
+        </ul>
+      </div>
+
+      <div class="bg-[#F8F5F0] rounded-lg border border-zinc-200/80 p-4 mb-4">
+        <h3 class="font-mono text-[11px] font-semibold uppercase tracking-[0.1em] text-zinc-600 mb-3">CLI governance gap</h3>
+        <p class="text-[14px] text-zinc-700 leading-[1.6]">
+          <strong class="text-zinc-900">The Bifrost CLI config supports only 3 fields:</strong> <code class="font-mono text-[12px] bg-white px-1 rounded">base_url</code>, <code class="font-mono text-[12px] bg-white px-1 rounded">default_harness</code>, <code class="font-mono text-[12px] bg-white px-1 rounded">default_model</code>. No mechanism for flag passthrough. I typically always run Claude Code with <code class="font-mono text-[12px] bg-white px-1 rounded">--dangerously-skip-permissions</code>. The same can apply to other developers too but the point is - flexibility to do so is missing. I found no prior reports or a feature request for this in GitHub issues.
+        </p>
+      </div>
+
+      <div class="space-y-3">
+        <h3 class="font-mono text-[11px] font-semibold uppercase tracking-[0.1em] text-zinc-600">Recommendations</h3>
+        <div class="space-y-2">
+          <div class="flex gap-3">
+            <div class="shrink-0 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center mt-0.5">
+              <span class="font-mono text-[10px] font-bold text-primary">1</span>
             </div>
-        </section>
-
-        <!-- TL;DR -->
-        <section id="tldr" class="section-reveal bg-white border border-zinc-200/80 rounded-xl shadow-sm p-8">
-            <h2 class="text-2xl font-display font-600 text-zinc-900 mb-4">TL;DR</h2>
-            <div class="space-y-4 text-zinc-700 leading-relaxed">
-                <!-- CONTENT: 3-sentence summary + key insight -->
-                <p class="text-lg">
-                    <!-- TODO: Fill with actual summary -->
-                    Bifrost is a genuinely fast, well-architected gateway with a unique MCP differentiator that no competitor matches. However, the product's positioning as agent infrastructure is undermined by defaults that break on agentic workloads, and the gateway-to-platform conversion funnel has three sequential friction points that leak developer interest before it becomes revenue.
-                </p>
-                <div class="bg-primary/5 border border-primary/20 rounded-lg p-4">
-                    <p class="font-mono text-xs text-primary uppercase tracking-wider mb-1">Key Insight</p>
-                    <p class="text-zinc-800 font-medium">
-                        <!-- TODO: Fill with the single most important insight -->
-                        Bifrost's strongest strategic asset — the MCP gateway — currently creates value in the free tier without surfacing the pain that makes the enterprise tier compelling. The free-to-paid boundary needs to make governance feel necessary, not just available.
-                    </p>
-                </div>
+            <p class="text-[14px] text-zinc-700 leading-[1.6]">Prioritize the goroutine leak fix (<a href="https://github.com/maximhq/bifrost/issues/828" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline underline-offset-2">#828</a>).</p>
+          </div>
+          <div class="flex gap-3">
+            <div class="shrink-0 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center mt-0.5">
+              <span class="font-mono text-[10px] font-bold text-primary">2</span>
             </div>
-        </section>
+            <p class="text-[14px] text-zinc-700 leading-[1.6]">Add <code class="font-mono text-[12px] bg-zinc-100 px-1 rounded">agent_flags</code> or <code class="font-mono text-[12px] bg-zinc-100 px-1 rounded">extra_args</code> to CLI config, or support <code class="font-mono text-[12px] bg-zinc-100 px-1 rounded">--</code> separator for passthrough args</p>
+          </div>
+        </div>
+      </div>
 
-        <!-- Methodology -->
-        <section id="methodology" class="section-reveal bg-white border border-zinc-200/80 rounded-xl shadow-sm p-8">
-            <h2 class="text-2xl font-display font-600 text-zinc-900 mb-4">Methodology</h2>
-            <div class="space-y-4 text-zinc-700 leading-relaxed">
-                <!-- TODO: Fill with actual methodology -->
-                <p>I approached this evaluation as a developer encountering Bifrost for the first time, combined with systematic research into the product's competitive positioning, community sentiment, and open issues.</p>
+      <blockquote class="font-display italic text-[16px] text-primary border-l-[3px] border-primary/30 pl-4 mt-4">
+        These are primary use cases for developers & enterprises evaluating the AI gateway or the Bifrost CLI. Running into HTTP 500 errors during a long coding session is a developer who will uninstall. The CLI is the acquisition channel for the enterprise offering. If it's unreliable or strips developer configuration, power users can choose to skip using it.
+      </blockquote>
+    </div>
+  </div>
+</section>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="bg-cream rounded-lg p-4">
-                        <p class="font-mono text-xs text-zinc-500 uppercase tracking-wider mb-2">Hands-On Testing</p>
-                        <ul class="text-sm space-y-1">
-                            <li>First-run setup via <code class="text-xs bg-zinc-100 px-1 rounded">npx</code></li>
-                            <li>Claude Code session through Bifrost CLI</li>
-                            <li>Multi-provider routing (OpenAI + Anthropic)</li>
-                            <li>Observability auto-capture verification</li>
-                            <li>MCP gateway feature boundary mapping</li>
-                        </ul>
-                    </div>
-                    <div class="bg-cream rounded-lg p-4">
-                        <p class="font-mono text-xs text-zinc-500 uppercase tracking-wider mb-2">Research</p>
-                        <ul class="text-sm space-y-1">
-                            <li>89 open GitHub issues analyzed</li>
-                            <li>GitHub Discussions + HN sentiment</li>
-                            <li>Competitive analysis (Portkey, Helicone, Braintrust, LiteLLM)</li>
-                            <li>Q1 2026 roadmap review</li>
-                        </ul>
-                    </div>
-                </div>
+<!-- Priority 3 -->
+<section class="section-card">
+  <div class="bg-white border border-zinc-200/80 rounded-xl shadow-sm overflow-hidden">
+    <div class="p-5 md:p-6">
+      <p class="font-mono text-[10px] font-semibold uppercase tracking-[0.15em] text-primary mb-2">Priority 03</p>
+      <h2 class="font-display text-xl md:text-2xl font-semibold tracking-tight text-zinc-900 mb-4">OSS to Enterprise - Conversion funnel polish</h2>
 
-                <div class="bg-cream rounded-lg p-4">
-                    <p class="font-mono text-xs text-zinc-500 uppercase tracking-wider mb-2">Environment</p>
-                    <p class="text-sm font-mono">Bifrost v1.4.14 · macOS · npx install · Web UI config mode · 84 requests captured</p>
-                </div>
-            </div>
-        </section>
+      <div class="space-y-2.5 text-[15px] text-zinc-700 leading-[1.6] mb-4">
+        <p>
+          During my evaluation, I found that the OSS AI gateway-to-platform conversion path is functional but the discoverability friction is real.
+        </p>
+        <p>
+          My initial Bifrost and Maxim docs research suggested three high-severity integration gaps: no Web UI method for the Maxim plugin, a config.json file reliance, and a missing tutorial. I tested each one directly. The actual product experience was better than the documentation indicated. The Connectors page under Observability in Bifrost has a working Maxim integration with a simple setup flow. I revised my assessment accordingly. The remaining friction is about <strong class="text-zinc-900">discoverability</strong>.
+        </p>
+      </div>
 
-        <!-- Where Bifrost Wins -->
-        <section id="strengths" class="section-reveal bg-white border border-zinc-200/80 rounded-xl shadow-sm p-8">
-            <h2 class="text-2xl font-display font-600 text-zinc-900 mb-4">Where Bifrost Wins</h2>
-            <div class="space-y-6 text-zinc-700 leading-relaxed">
-                <!-- TODO: Fill with 2-3 genuine strengths with evidence -->
+      <div class="space-y-3 mb-4">
+        <div class="flex gap-3 items-start">
+          <span class="insight-tag severity-high shrink-0 mt-0.5">Friction 1</span>
+          <div>
+            <p class="text-[14px] font-semibold text-zinc-900">Work email signup can block developer conversion</p>
+            <p class="text-[13px] text-zinc-600 leading-[1.5]">Each developer Bifrost acquires (solo dev, indie hacker) gets blocked at Maxim signup. The work email requirement filters for enterprise leads but blocks the developer-led adoption that the OSS gateway is designed to drive. Braintrust, Langfuse, and Helicone all allow personal emails for free tiers.</p>
+          </div>
+        </div>
+        <div class="flex gap-3 items-start">
+          <span class="insight-tag severity-high shrink-0 mt-0.5">Friction 2</span>
+          <div>
+            <p class="text-[14px] font-semibold text-zinc-900">Plugins vs Connectors confusion</p>
+            <p class="text-[13px] text-zinc-600 leading-[1.5]">The Plugins page (custom <code class="font-mono text-[11px] bg-zinc-100 px-1 rounded">.so</code> files) and the Connectors page (built-in integrations like Maxim) are separate UI locations. A developer who finds the Plugins page first will think Maxim integration requires a compiled plugin. This was my assumption too.</p>
+          </div>
+        </div>
+      </div>
 
-                <!-- Strength 1 -->
-                <div>
-                    <h3 class="text-lg font-display font-600 text-zinc-800 mb-2">Zero-Config Observability That Actually Works</h3>
-                    <p><!-- TODO: Describe the auto-capture experience, reference screenshots --></p>
-                    <figure class="my-4">
-                        <!-- TODO: Add screenshot -->
-                        <img src="" alt="Bifrost dashboard showing auto-captured traces" class="rounded-lg border border-zinc-200 shadow-sm w-full">
-                        <figcaption class="text-xs text-zinc-500 mt-2 text-center font-mono">Dashboard after a Claude Code session — 84 requests captured automatically</figcaption>
-                    </figure>
-                </div>
+      <div class="space-y-2">
+        <h3 class="font-mono text-[11px] font-semibold uppercase tracking-[0.1em] text-zinc-600">What I'd do</h3>
+        <div class="flex gap-3">
+          <div class="shrink-0 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center mt-0.5"><span class="font-mono text-[10px] font-bold text-primary">1</span></div>
+          <p class="text-[14px] text-zinc-700 leading-[1.6]">Allow personal email signup for Maxim. Maybe introduce a free Developer tier (10K logs, 3-day retention, low abuse risk)</p>
+        </div>
+        <div class="flex gap-3">
+          <div class="shrink-0 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center mt-0.5"><span class="font-mono text-[10px] font-bold text-primary">2</span></div>
+          <p class="text-[14px] text-zinc-700 leading-[1.6]">Consolidate or cross-link the Plugins and Connectors pages for clarity.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-                <!-- Strength 2 -->
-                <div>
-                    <h3 class="text-lg font-display font-600 text-zinc-800 mb-2">Drop-In Provider Abstraction</h3>
-                    <p><!-- TODO: Describe the routing test results --></p>
-                </div>
+<!-- ═══ WHERE BIFROST WINS ═══ -->
+<section id="strengths" class="section-card">
+  <div class="bg-white border border-zinc-200/80 rounded-xl shadow-sm overflow-hidden">
+    <div class="p-5 md:p-6">
+      <p class="font-mono text-[10px] font-semibold uppercase tracking-[0.15em] text-primary mb-2">What Works</p>
+      <h2 class="font-display text-xl md:text-2xl font-semibold tracking-tight text-zinc-900 mb-4">Where Bifrost wins</h2>
 
-                <!-- Strength 3 -->
-                <div>
-                    <h3 class="text-lg font-display font-600 text-zinc-800 mb-2">MCP Gateway — A Genuine Differentiator</h3>
-                    <p><!-- TODO: Describe what no other gateway offers --></p>
-                </div>
-            </div>
-        </section>
+      <div class="space-y-5">
+        <!-- Strength 1 -->
+        <div>
+          <h3 class="text-[15px] font-semibold text-zinc-900 mb-1.5">1. Zero-config observability that actually works</h3>
+          <p class="text-[14px] text-zinc-600 leading-[1.6] mb-2">
+            I pointed my OpenAI SDK at <code class="font-mono text-[12px] bg-zinc-100 px-1 rounded">localhost:8080/openai/v1</code>, changed nothing else, and Bifrost captured everything. 88% capture rate (15 of 17 fields, 2 were not configured hence the 88%) for both OpenAI and Anthropic. Zero discrepancies between providers. Token counts matched the SDK's response objects exactly.
+          </p>
+          <p class="text-[14px] text-zinc-600 leading-[1.6]">
+            Competitors like Langfuse and Braintrust require SDK instrumentation. Bifrost captures the same data by sitting in the network path. For a team that can't afford to instrument every service, this is genuinely faster.
+          </p>
+        </div>
 
-        <!-- Product Opportunities -->
-        <section id="opportunities" class="section-reveal bg-white border border-zinc-200/80 rounded-xl shadow-sm p-8">
-            <h2 class="text-2xl font-display font-600 text-zinc-900 mb-4">Product Opportunities</h2>
-            <div class="space-y-6 text-zinc-700 leading-relaxed">
-                <!-- TODO: Fill with forward-looking product ideas -->
-                <p>These aren't friction points — they're expansion ideas where Bifrost could go that competitors haven't.</p>
-            </div>
-        </section>
+        <!-- Strength 2 -->
+        <div>
+          <h3 class="text-[15px] font-semibold text-zinc-900 mb-1.5">2. Drop-in provider abstraction</h3>
+          <p class="text-[14px] text-zinc-600 leading-[1.6]">
+            Same code, same SDK, one <code class="font-mono text-[12px] bg-zinc-100 px-1 rounded">base_url</code> change. OpenAI <code class="font-mono text-[12px] bg-zinc-100 px-1 rounded">gpt-4o-mini</code> (1602ms) and Anthropic <code class="font-mono text-[12px] bg-zinc-100 px-1 rounded">claude-opus-4-6</code> (4433ms) both worked through the same endpoint. Bifrost translated the OpenAI chat format to Anthropic's native API transparently.
+          </p>
+        </div>
 
-        <!-- What I'd Improve -->
-        <section id="improvements" class="section-reveal bg-white border border-zinc-200/80 rounded-xl shadow-sm p-8">
-            <h2 class="text-2xl font-display font-600 text-zinc-900 mb-4">What I'd Improve</h2>
-            <div class="space-y-8 text-zinc-700 leading-relaxed">
-                <!-- TODO: Fill with 3-5 prioritized recommendations -->
+        <!-- Strength 3 -->
+        <div>
+          <h3 class="text-[15px] font-semibold text-zinc-900 mb-1.5">3. MCP gateway: first mover in an emerging category</h3>
+          <p class="text-[14px] text-zinc-600 leading-[1.6] mb-3">
+            Bifrost was among the first AI gateways to ship MCP gateway functionality. Portkey followed in January 2026, and LiteLLM has open-source MCP proxy support. Bifrost's implementation is the most integrated with a broader observability platform: register servers through a Web UI, discover tools automatically, log every tool call. I registered Paper.design (19 MCP tools), Bifrost discovered all of them and logged every call with tool name, arguments, result, latency, and status.
+          </p>
+          <figure>
+            <img src="images/mcp-catalog-connected.png" alt="Bifrost MCP Catalog showing Paper.design server connected with 19/19 tools enabled" class="w-full rounded-lg border border-zinc-200 shadow-sm"/>
+            <figcaption class="text-[11px] text-zinc-500 font-mono mt-2 text-center">Paper.design registered in Bifrost's MCP Catalog. 19/19 tools enabled, state: connected.</figcaption>
+          </figure>
+        </div>
 
-                <!-- Recommendation template -->
-                <div class="border-l-4 border-primary/30 pl-6">
-                    <div class="flex items-center gap-3 mb-2">
-                        <span class="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-white text-sm font-mono font-600">1</span>
-                        <h3 class="text-lg font-display font-600 text-zinc-800">Agent Infrastructure That Breaks on Agents</h3>
-                        <span class="font-mono text-xs bg-red-50 text-red-700 border border-red-200 px-2 py-0.5 rounded-full">Critical</span>
-                    </div>
-                    <p><!-- TODO: Fill --></p>
-                </div>
+        <!-- Strength 4 -->
+        <div>
+          <h3 class="text-[15px] font-semibold text-zinc-900 mb-1.5">4. Maxim integration works</h3>
+          <p class="text-[14px] text-zinc-600 leading-[1.6]">
+            The Connectors page under Observability has Maxim as a built-in integration. API key, log repository ID, enable toggle, save. Traces flow automatically. Maxim's dashboard shows cost, tokens, latency, model tags, full input/output, and error details for every request.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-                <div class="border-l-4 border-primary/30 pl-6">
-                    <div class="flex items-center gap-3 mb-2">
-                        <span class="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-white text-sm font-mono font-600">2</span>
-                        <h3 class="text-lg font-display font-600 text-zinc-800">The Conversion Funnel Has Three Leaks</h3>
-                        <span class="font-mono text-xs bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full">High</span>
-                    </div>
-                    <p><!-- TODO: Fill --></p>
-                </div>
+<!-- ═══ METHODOLOGY ═══ -->
+<section id="methodology" class="section-card">
+  <div class="bg-white border border-zinc-200/80 rounded-xl shadow-sm overflow-hidden">
+    <div class="p-5 md:p-6">
+      <p class="font-mono text-[10px] font-semibold uppercase tracking-[0.15em] text-primary mb-2">Evidence</p>
+      <h2 class="font-display text-xl md:text-2xl font-semibold tracking-tight text-zinc-900 mb-4">Methodology</h2>
 
-                <div class="border-l-4 border-primary/30 pl-6">
-                    <div class="flex items-center gap-3 mb-2">
-                        <span class="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-white text-sm font-mono font-600">3</span>
-                        <h3 class="text-lg font-display font-600 text-zinc-800">MCP Free-to-Enterprise Bridge</h3>
-                        <span class="font-mono text-xs bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full">High</span>
-                    </div>
-                    <p><!-- TODO: Fill --></p>
-                </div>
-            </div>
-        </section>
+      <div class="overflow-x-auto mb-4">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Activity</th>
+              <th scope="col">Evidence</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Installed Bifrost, configured 2 providers</td><td class="font-mono text-[12px]">config/bifrost-config.json</td></tr>
+            <tr><td>Claude Code session through Bifrost CLI</td><td>84 requests captured</td></tr>
+            <tr><td>Multi-provider routing + failover test</td><td>Both providers PASS, no auto-fallback</td></tr>
+            <tr><td>Auto-capture observability verification</td><td>88% capture rate, 0 discrepancies</td></tr>
+            <tr><td>MCP gateway: Paper.design (19 tools)</td><td>11 MCP tool calls, 22 LLM requests</td></tr>
+            <tr><td>Bifrost → Maxim end-to-end pipeline</td><td>Traces flowing, cost + tokens visible</td></tr>
+            <tr><td>Code Mode vs Classic Mode comparison</td><td>No savings at 1 server / 19 tools</td></tr>
+            <tr><td>Friction log (8 points)</td><td class="font-mono text-[12px]">setup/friction-log.md</td></tr>
+            <tr><td>GitHub issues + community analysis</td><td>89 open issues analyzed</td></tr>
+          </tbody>
+        </table>
+      </div>
 
-        <!-- Forward-Looking -->
-        <section id="forward" class="section-reveal bg-white border border-zinc-200/80 rounded-xl shadow-sm p-8">
-            <h2 class="text-2xl font-display font-600 text-zinc-900 mb-4">Forward-Looking</h2>
-            <div class="space-y-4 text-zinc-700 leading-relaxed">
-                <!-- TODO: Strategic recommendation aligned with Q1 2026 roadmap -->
-                <p>One strategic recommendation aligned with Bifrost's roadmap direction.</p>
-            </div>
-        </section>
+      <div class="bg-[#F8F5F0] rounded-lg border border-zinc-200/80 p-4 mb-4">
+        <h3 class="font-mono text-[11px] font-semibold uppercase tracking-[0.1em] text-zinc-600 mb-2">What was not tested</h3>
+        <p class="text-[13px] text-zinc-600 leading-[1.5]">
+          Streaming under load, semantic caching, adaptive routing, guardrails, Code Mode at scale (3+ servers / 150+ tools), high-concurrency testing, and HA clustering. These are gaps in my evaluation, not confirmed problems.
+        </p>
+      </div>
 
-        <!-- About -->
-        <section id="about" class="section-reveal bg-white border border-zinc-200/80 rounded-xl shadow-sm p-8">
-            <h2 class="text-2xl font-display font-600 text-zinc-900 mb-4">About</h2>
-            <div class="text-zinc-700 leading-relaxed">
-                <p class="mb-3">
-                    <strong>Reehan Ahmed</strong> — Senior Platform Product Manager at Whatfix, where I lead the Context Layer for ScreenSense (element detection, Smart Context, Smart Targeting). I've taken finder algorithm accuracy from 15-20% content failure to &lt;2%, built AI evaluation frameworks, and shipped diagnostics tools used by 700+ customers.
-                </p>
-                <div class="flex gap-4 text-sm">
-                    <a href="https://linkedin.com/in/r-eehan" class="text-primary hover:underline">LinkedIn</a>
-                    <a href="https://github.com/r-eehan" class="text-primary hover:underline">GitHub</a>
-                    <a href="https://github.com/r-eehan/bifrost-product-evaluation" class="text-primary hover:underline">Source Code</a>
-                </div>
-            </div>
-        </section>
+      <div class="bg-[#F8F5F0] rounded-lg border border-zinc-200/80 p-4 mb-4">
+        <h3 class="font-mono text-[11px] font-semibold uppercase tracking-[0.1em] text-zinc-600 mb-2">Environment</h3>
+        <p class="text-[13px] text-zinc-600 font-mono leading-[1.5]">
+          Bifrost v1.4.14 · macOS · npx install · Python 3.11 · OpenAI SDK · Paper.design v0.1.10 (19 tools) · SQLite direct queries
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
 
-    </main>
+<!-- ═══ ABOUT ═══ -->
+<section id="about" class="section-card">
+  <div class="bg-white border border-zinc-200/80 rounded-xl shadow-sm overflow-hidden">
+    <div class="p-5 md:p-6">
+      <h2 class="font-display text-xl md:text-2xl font-semibold tracking-tight text-zinc-900 mb-4">About</h2>
+      <div class="text-[15px] text-zinc-700 leading-[1.65]">
+        <p class="mb-3">
+          <strong class="text-zinc-900">Reehan Ahmed</strong>. Senior Platform Product Manager at Whatfix, I've spent 4+ years building the AI-native context detection platform that powers all Whatfix products. The most counterintuitive thing I've learned is when NOT to use AI. Achieved a 10x improvement in context detection by rigorous algorithmic improvements, in the pre-LLM era.
+        </p>
+        <div class="flex gap-4 text-[13px]">
+          <a href="https://www.linkedin.com/in/reehan-ahmed/" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline underline-offset-2">LinkedIn</a>
+          <span class="text-zinc-300" aria-hidden="true">/</span>
+          <a href="https://github.com/R-eehan" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline underline-offset-2">GitHub</a>
+          <span class="text-zinc-300" aria-hidden="true">/</span>
+          <a href="https://github.com/R-eehan/bifrost-product-evaluation" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline underline-offset-2">Source Code</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-    <!-- Footer -->
-    <footer class="max-w-3xl mx-auto px-6 py-8 text-center text-sm text-zinc-400 font-mono">
-        <p>Built with genuine product curiosity. March 2026.</p>
-    </footer>
+</main>
 
-    <!-- Scripts -->
-    <script>
-        // Scroll progress bar
-        const progressBar = document.getElementById('progress-bar');
-        window.addEventListener('scroll', () => {
-            const scrollTop = window.scrollY;
-            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-            const progress = docHeight > 0 ? scrollTop / docHeight : 0;
-            progressBar.style.transform = `scaleX(${progress})`;
-        });
+<!-- Footer -->
+<footer class="border-t border-zinc-300/50 py-5 px-5">
+  <div class="max-w-3xl mx-auto flex items-center justify-between">
+    <span class="font-mono text-[10px] text-zinc-500 uppercase tracking-widest">2026</span>
+    <div class="flex items-center gap-4">
+      <a href="prototype-mcp-cost-attribution-v2.html" class="font-mono text-[11px] text-zinc-500 hover:text-primary transition-colors">MCP Prototype</a>
+      <span class="text-zinc-300 text-[10px]" aria-hidden="true">/</span>
+      <a href="https://github.com/R-eehan/bifrost-product-evaluation" target="_blank" rel="noopener noreferrer" class="font-mono text-[11px] text-zinc-500 hover:text-primary transition-colors">GitHub</a>
+    </div>
+  </div>
+</footer>
 
-        // Section reveal on scroll
-        const observer = new IntersectionObserver(
-            (entries) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('visible');
-                    }
-                });
-            },
-            { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
-        );
-        document.querySelectorAll('.section-reveal').forEach((el) => observer.observe(el));
+<!-- JavaScript -->
+<script>
+/* Scroll progress */
+window.addEventListener('scroll', () => {
+  const pct = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight) * 100;
+  document.getElementById('scroll-bar').style.width = Math.min(pct, 100) + '%';
+}, { passive: true });
 
-        // Active ToC tracking
-        const tocLinks = document.querySelectorAll('.toc-link');
-        const sections = document.querySelectorAll('section[id]');
-        const tocObserver = new IntersectionObserver(
-            (entries) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                        tocLinks.forEach((link) => link.classList.remove('active'));
-                        const activeLink = document.querySelector(`.toc-link[href="#${entry.target.id}"]`);
-                        if (activeLink) activeLink.classList.add('active');
-                    }
-                });
-            },
-            { threshold: 0.3, rootMargin: '-80px 0px -60% 0px' }
-        );
-        sections.forEach((section) => tocObserver.observe(section));
-    </script>
+/* Intersection observer for card reveal */
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+if (!prefersReducedMotion) {
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.08 });
+
+  document.querySelectorAll('.section-card').forEach(el => obs.observe(el));
+} else {
+  document.querySelectorAll('.section-card').forEach(el => el.classList.add('visible'));
+}
+
+/* ToC active section tracking */
+const tocLinks = document.querySelectorAll('.toc-link');
+const sections = document.querySelectorAll('section[id]');
+
+const tocObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      tocLinks.forEach(link => link.classList.remove('active'));
+      const active = document.querySelector(`.toc-link[data-toc="${e.target.id}"]`);
+      if (active) active.classList.add('active');
+    }
+  });
+}, { rootMargin: '-20% 0px -60% 0px' });
+
+sections.forEach(s => tocObs.observe(s));
+</script>
 </body>
 </html>
