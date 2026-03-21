@@ -1,0 +1,357 @@
+{
+  "test": "mcp_live_paper_design",
+  "timestamp": "2026-03-21T13:21:23",
+  "mcp_server": "paper-desktop v0.1.10",
+  "design_task": "Landing page for fictional SaaS product Beacon",
+  "mcp_tool_calls": {
+    "total": 11,
+    "per_tool": {
+      "write_html": {
+        "count": 6,
+        "avg_latency_ms": 73.5
+      },
+      "get_basic_info": {
+        "count": 1,
+        "avg_latency_ms": 20.0
+      },
+      "get_font_family_info": {
+        "count": 1,
+        "avg_latency_ms": 18.0
+      },
+      "create_artboard": {
+        "count": 1,
+        "avg_latency_ms": 29.0
+      },
+      "get_screenshot": {
+        "count": 1,
+        "avg_latency_ms": 768.0
+      },
+      "finish_working_on_nodes": {
+        "count": 1,
+        "avg_latency_ms": 3.0
+      }
+    },
+    "calls": [
+      {
+        "tool_name": "get_basic_info",
+        "server_label": "paper",
+        "status": "success",
+        "latency": 20.0,
+        "cost": null,
+        "arguments": "\"{}\"",
+        "result": "{\"nodeCount\":259,\"artboardCount\":6,\"artboards\":[{\"height\":3380,\"top\":0,\"left\":872,\"id\":\"77-0\",\"name\":\"1\",\"childCount\":27,\"width\":832},{\"left\":-3433.742,\"id\":\"12-0\",\"name\":\"2\",\"childCount\":24,\"width\":832,\"height\":2784,\"top\":-1275.623},{\"id\":\"1T-0\",\"name\":\"3\",\"childCount\":38,\"width\":832,\"height\":2337,\"top\":-1275.623,\"left\":-2561.742},{\"left\":-1689.742,\"id\":\"2W-0\",\"name\":\"4\",\"childCount\":12,\"width\":832,\"height\":1440,\"top\":-1275.623},{\"height\":2720,\"top\":-1275.623,\"left\":-817.742,\"id\":\"3K-0\",\"name\":",
+        "created_at": "2026-03-21 07:47:30.836706+00:00"
+      },
+      {
+        "tool_name": "get_font_family_info",
+        "server_label": "paper",
+        "status": "success",
+        "latency": 18.0,
+        "cost": null,
+        "arguments": "\"{\\\"familyNames\\\":[\\\"Inter\\\",\\\"DM Sans\\\",\\\"Space Grotesk\\\"]}\"",
+        "result": "{\"fontsPerFamily\":{\"Inter\":[{\"style\":\"Thin\",\"weight\":100,\"isItalic\":false,\"axes\":{\"wght\":{\"tag\":\"wght\",\"min\":100,\"max\":900},\"opsz\":{\"min\":14,\"max\":32,\"tag\":\"opsz\"}},\"coordinates\":{\"wght\":100,\"opsz\":-1}},{\"isItalic\":false,\"axes\":{\"wght\":{\"tag\":\"wght\",\"min\":100,\"max\":900},\"opsz\":{\"tag\":\"opsz\",\"min\":14,\"max\":32}},\"coordinates\":{\"wght\":200,\"opsz\":-1},\"style\":\"ExtraLight\",\"weight\":200},{\"axes\":{\"opsz\":{\"tag\":\"opsz\",\"min\":14,\"max\":32},\"wght\":{\"tag\":\"wght\",\"min\":100,\"max\":900}},\"coordinates\":{\"wght\":30",
+        "created_at": "2026-03-21 07:47:31.093195+00:00"
+      },
+      {
+        "tool_name": "create_artboard",
+        "server_label": "paper",
+        "status": "success",
+        "latency": 29.0,
+        "cost": null,
+        "arguments": "\"{\\\"name\\\":\\\"Beacon Landing Page\\\",\\\"styles\\\":{\\\"flexDirection\\\":\\\"column\\\",\\\"width\\\":\\\"1440px\\\",\\\"height\\\":\\\"1024px\\\",\\\"top\\\":\\\"200px\\\",\\\"left\\\":\\\"1800px\\\",\\\"backgroundColor\\\":\\\"#FAFAFA\\\",\\\"display\\\":\\\"flex\\\"}}\"",
+        "result": "{\"width\":1440,\"height\":1024,\"id\":\"8A-0\",\"name\":\"Beacon Landing Page\",\"top\":1524,\"left\":-818}",
+        "created_at": "2026-03-21 07:47:40.786852+00:00"
+      },
+      {
+        "tool_name": "write_html",
+        "server_label": "paper",
+        "status": "success",
+        "latency": 26.0,
+        "cost": null,
+        "arguments": "\"{\\\"html\\\":\\\"<div layer-name=\\\\\\\"Navbar\\\\\\\" style=\\\\\\\"display: flex; align-items: center; justify-content: space-between; padding: 20px 80px; width: 100%; box-sizing: border-box;\\\\\\\">\\\\n  <div style=\\\\\\\"display: flex; align-items: center; gap: 10px;\\\\\\\">\\\\n    <div style=\\\\\\\"width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, #F59E0B, #D97706);\\\\\\\"></div>\\\\n    <span style=\\\\\\\"font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 20px; color: #0F17",
+        "result": "{\"createdNodes\":[{\"id\":\"8B-0\",\"name\":\"Navbar\",\"component\":\"Frame\"},{\"id\":\"8C-0\",\"name\":\"Frame\",\"component\":\"Frame\"},{\"id\":\"8D-0\",\"name\":\"Rectangle\",\"component\":\"Rectangle\"},{\"id\":\"8E-0\",\"name\":\"Beacon\",\"component\":\"Text\"},{\"component\":\"Frame\",\"id\":\"8F-0\",\"name\":\"Frame\"},{\"id\":\"8G-0\",\"name\":\"Features\",\"component\":\"Text\"},{\"name\":\"Pricing\",\"component\":\"Text\",\"id\":\"8H-0\"},{\"id\":\"8I-0\",\"name\":\"Docs\",\"component\":\"Text\"},{\"id\":\"8J-0\",\"name\":\"Frame\",\"component\":\"Frame\"},{\"name\":\"Get Started\",\"component",
+        "created_at": "2026-03-21 07:47:50.037849+00:00"
+      },
+      {
+        "tool_name": "write_html",
+        "server_label": "paper",
+        "status": "success",
+        "latency": 18.0,
+        "cost": null,
+        "arguments": "\"{\\\"html\\\":\\\"<div layer-name=\\\\\\\"Hero Section\\\\\\\" style=\\\\\\\"display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 80px 60px 80px; gap: 24px; width: 100%; box-sizing: border-box;\\\\\\\">\\\\n  <div style=\\\\\\\"display: flex; align-items: center; justify-content: center; padding: 6px 16px; background-color: #FEF3C7; border-radius: 100px;\\\\\\\">\\\\n    <span style=\\\\\\\"font-family: 'DM Sans', sans-serif; font-size: 13px; color: #92400E; font-weight: 600; letter-spa",
+        "result": "{\"createdNodes\":[{\"name\":\"Hero Section\",\"component\":\"Frame\",\"id\":\"8L-0\"},{\"id\":\"8M-0\",\"name\":\"Frame\",\"component\":\"Frame\"},{\"component\":\"Text\",\"id\":\"8N-0\",\"name\":\"NOW IN BETA\"},{\"name\":\"Know your team. Grow\u2026\",\"component\":\"Text\",\"id\":\"8O-0\"},{\"id\":\"8P-0\",\"name\":\"Beacon surfaces the \u2026\",\"component\":\"Text\"},{\"id\":\"8Q-0\",\"name\":\"Frame\",\"component\":\"Frame\"},{\"id\":\"8R-0\",\"name\":\"Frame\",\"component\":\"Frame\"},{\"id\":\"8S-0\",\"name\":\"Start Free Trial\",\"component\":\"Text\"},{\"id\":\"8T-0\",\"name\":\"Frame\",\"component\"",
+        "created_at": "2026-03-21 07:48:03.244568+00:00"
+      },
+      {
+        "tool_name": "write_html",
+        "server_label": "paper",
+        "status": "success",
+        "latency": 17.0,
+        "cost": null,
+        "arguments": "\"{\\\"html\\\":\\\"<div layer-name=\\\\\\\"Features Section\\\\\\\" style=\\\\\\\"display: flex; flex-direction: column; align-items: center; padding: 20px 80px 40px 80px; gap: 40px; width: 100%; box-sizing: border-box;\\\\\\\">\\\\n  <div style=\\\\\\\"display: flex; flex-direction: column; align-items: center; gap: 8px;\\\\\\\">\\\\n    <span style=\\\\\\\"font-family: 'DM Sans', sans-serif; font-size: 13px; color: #F59E0B; font-weight: 700; letter-spacing: 1.5px;\\\\\\\">FEATURES</span>\\\\n    <span style=\\\\\\\"font-family: 'Space Grote",
+        "result": "{\"createdNodes\":[{\"id\":\"8V-0\",\"name\":\"Features Section\",\"component\":\"Frame\"},{\"id\":\"8W-0\",\"name\":\"Frame\",\"component\":\"Frame\"},{\"id\":\"8X-0\",\"name\":\"FEATURES\",\"component\":\"Text\"},{\"id\":\"8Y-0\",\"name\":\"Everything you need,\u2026\",\"component\":\"Text\"}]}",
+        "created_at": "2026-03-21 07:48:08.62398+00:00"
+      },
+      {
+        "tool_name": "write_html",
+        "server_label": "paper",
+        "status": "success",
+        "latency": 21.0,
+        "cost": null,
+        "arguments": "\"{\\\"html\\\":\\\"<div layer-name=\\\\\\\"Feature Cards Row\\\\\\\" style=\\\\\\\"display: flex; align-items: flex-start; gap: 24px; width: 100%; box-sizing: border-box;\\\\\\\">\\\\n  <div layer-name=\\\\\\\"Card \u2014 Velocity\\\\\\\" style=\\\\\\\"display: flex; flex-direction: column; padding: 32px; gap: 16px; background-color: #FFFFFF; border-radius: 16px; border: 1px solid #E2E8F0; flex: 1;\\\\\\\">\\\\n    <div style=\\\\\\\"width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, #DBEAFE, #BFDBFE); display: f",
+        "result": "{\"createdNodes\":[{\"id\":\"8Z-0\",\"name\":\"Feature Cards Row\",\"component\":\"Frame\"},{\"id\":\"90-0\",\"name\":\"Card \u2014 Velocity\",\"component\":\"Frame\"},{\"id\":\"91-0\",\"name\":\"Frame\",\"component\":\"Frame\"},{\"id\":\"92-0\",\"name\":\"SVG\",\"component\":\"SVG\"},{\"component\":\"SVGVisualElement\",\"id\":\"93-0\",\"name\":\"Polyline\"},{\"name\":\"Team Velocity\",\"component\":\"Text\",\"id\":\"94-0\"},{\"name\":\"Track sprint through\u2026\",\"component\":\"Text\",\"id\":\"95-0\"}]}",
+        "created_at": "2026-03-21 07:48:17.572382+00:00"
+      },
+      {
+        "tool_name": "write_html",
+        "server_label": "paper",
+        "status": "success",
+        "latency": 12.0,
+        "cost": null,
+        "arguments": "\"{\\\"mode\\\":\\\"insert-children\\\",\\\"html\\\":\\\"<div layer-name=\\\\\\\"Card \u2014 Engagement\\\\\\\" style=\\\\\\\"display: flex; flex-direction: column; padding: 32px; gap: 16px; background-color: #FFFFFF; border-radius: 16px; border: 1px solid #E2E8F0; flex: 1;\\\\\\\">\\\\n  <div style=\\\\\\\"width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, #FEF3C7, #FDE68A); display: flex; align-items: center; justify-content: center;\\\\\\\">\\\\n    <svg width=\\\\\\\"22\\\\\\\" height=\\\\\\\"22\\\\\\\" viewBox=\\\\\\\"0 0 24",
+        "result": "{\"createdNodes\":[{\"id\":\"96-0\",\"name\":\"Card \u2014 Engagement\",\"component\":\"Frame\"},{\"id\":\"97-0\",\"name\":\"Frame\",\"component\":\"Frame\"},{\"id\":\"98-0\",\"name\":\"SVG\",\"component\":\"SVG\"},{\"id\":\"99-0\",\"name\":\"Path\",\"component\":\"SVGVisualElement\"},{\"id\":\"9A-0\",\"name\":\"Circle\",\"component\":\"SVGVisualElement\"},{\"component\":\"SVGVisualElement\",\"id\":\"9B-0\",\"name\":\"Path\"},{\"id\":\"9C-0\",\"name\":\"Path\",\"component\":\"SVGVisualElement\"},{\"component\":\"Text\",\"id\":\"9D-0\",\"name\":\"Engagement Pulse\"},{\"name\":\"Spot disengagement e\u2026\"",
+        "created_at": "2026-03-21 07:48:25.140275+00:00"
+      },
+      {
+        "tool_name": "write_html",
+        "server_label": "paper",
+        "status": "success",
+        "latency": 347.0,
+        "cost": null,
+        "arguments": "\"{\\\"html\\\":\\\"<div layer-name=\\\\\\\"Card \u2014 Alignment\\\\\\\" style=\\\\\\\"display: flex; flex-direction: column; padding: 32px; gap: 16px; background-color: #FFFFFF; border-radius: 16px; border: 1px solid #E2E8F0; flex: 1;\\\\\\\">\\\\n  <div style=\\\\\\\"width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, #D1FAE5, #A7F3D0); display: flex; align-items: center; justify-content: center;\\\\\\\">\\\\n    <svg width=\\\\\\\"22\\\\\\\" height=\\\\\\\"22\\\\\\\" viewBox=\\\\\\\"0 0 24 24\\\\\\\" fill=\\\\\\\"none\\\\\\\" stro",
+        "result": "{\"createdNodes\":[{\"id\":\"9F-0\",\"name\":\"Card \u2014 Alignment\",\"component\":\"Frame\"},{\"id\":\"9G-0\",\"name\":\"Frame\",\"component\":\"Frame\"},{\"id\":\"9H-0\",\"name\":\"SVG\",\"component\":\"SVG\"},{\"id\":\"9I-0\",\"name\":\"Circle\",\"component\":\"SVGVisualElement\"},{\"id\":\"9J-0\",\"name\":\"Line\",\"component\":\"SVGVisualElement\"},{\"id\":\"9K-0\",\"name\":\"Path\",\"component\":\"SVGVisualElement\"},{\"name\":\"Goal Alignment\",\"component\":\"Text\",\"id\":\"9L-0\"},{\"component\":\"Text\",\"id\":\"9M-0\",\"name\":\"Connect individual w\u2026\"}]}",
+        "created_at": "2026-03-21 07:48:32.936797+00:00"
+      },
+      {
+        "tool_name": "get_screenshot",
+        "server_label": "paper",
+        "status": "success",
+        "latency": 768.0,
+        "cost": null,
+        "arguments": "\"{\\\"nodeId\\\":\\\"8A-0\\\",\\\"scale\\\":1}\"",
+        "result": "{\"role\":\"tool\",\"content\":\"[Image Response: /9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAA",
+        "created_at": "2026-03-21 07:48:37.077391+00:00"
+      },
+      {
+        "tool_name": "finish_working_on_nodes",
+        "server_label": "paper",
+        "status": "success",
+        "latency": 3.0,
+        "cost": null,
+        "arguments": "\"{\\\"nodeIds\\\":[\\\"8A-0\\\"]}\"",
+        "result": "\"OK\"",
+        "created_at": "2026-03-21 07:48:45.747172+00:00"
+      }
+    ]
+  },
+  "llm_requests": {
+    "total": 15,
+    "total_cost_usd": 0.93640575,
+    "total_tokens": 758794,
+    "total_prompt_tokens": 753839,
+    "total_completion_tokens": 4955,
+    "logs": [
+      {
+        "id": "297ebeb6-aa89-4ce7-9f16-e7690a35a8c1",
+        "provider": "anthropic",
+        "model": "claude-opus-4-6",
+        "status": "success",
+        "latency": 4186.0,
+        "cost": 0.02442,
+        "prompt_tokens": 4834,
+        "completion_tokens": 10,
+        "total_tokens": 4844,
+        "tool_calls": "",
+        "created_at": "2026-03-21 07:46:01.508469+00:00"
+      },
+      {
+        "id": "aacb9bc8-b46c-4dc5-bc2e-b45ad4847f57",
+        "provider": "anthropic",
+        "model": "claude-haiku-4-5-20251001",
+        "status": "success",
+        "latency": 666.0,
+        "cost": 1.3000000000000001e-05,
+        "prompt_tokens": 8,
+        "completion_tokens": 1,
+        "total_tokens": 9,
+        "tool_calls": "",
+        "created_at": "2026-03-21 07:47:05.972555+00:00"
+      },
+      {
+        "id": "de272552-40e2-46d5-b03b-fd47a84f903d",
+        "provider": "anthropic",
+        "model": "claude-haiku-4-5-20251001",
+        "status": "success",
+        "latency": 1125.0,
+        "cost": 0.000504,
+        "prompt_tokens": 414,
+        "completion_tokens": 18,
+        "total_tokens": 432,
+        "tool_calls": "",
+        "created_at": "2026-03-21 07:47:16.263114+00:00"
+      },
+      {
+        "id": "a0de4537-bed9-4442-aeb9-c992e87997f5",
+        "provider": "anthropic",
+        "model": "claude-opus-4-6",
+        "status": "success",
+        "latency": 14821.0,
+        "cost": 0.37950875000000006,
+        "prompt_tokens": 58738,
+        "completion_tokens": 496,
+        "total_tokens": 59234,
+        "tool_calls": "",
+        "created_at": "2026-03-21 07:47:16.273595+00:00"
+      },
+      {
+        "id": "c52af644-2268-4047-85e6-ce54b7560ea8",
+        "provider": "anthropic",
+        "model": "claude-opus-4-6",
+        "status": "success",
+        "latency": 9432.0,
+        "cost": 0.08045374999999999,
+        "prompt_tokens": 65489,
+        "completion_tokens": 355,
+        "total_tokens": 65844,
+        "tool_calls": "",
+        "created_at": "2026-03-21 07:47:31.337398+00:00"
+      },
+      {
+        "id": "efbbe184-9c10-41b4-b5be-6d4023f1f173",
+        "provider": "anthropic",
+        "model": "claude-opus-4-6",
+        "status": "success",
+        "latency": 9200.0,
+        "cost": 0.050592750000000006,
+        "prompt_tokens": 65908,
+        "completion_tokens": 609,
+        "total_tokens": 66517,
+        "tool_calls": "",
+        "created_at": "2026-03-21 07:47:40.825534+00:00"
+      },
+      {
+        "id": "4b713933-f747-4aa8-a273-47bfda0a1507",
+        "provider": "anthropic",
+        "model": "claude-opus-4-6",
+        "status": "success",
+        "latency": 13131.0,
+        "cost": 0.0582085,
+        "prompt_tokens": 66876,
+        "completion_tokens": 768,
+        "total_tokens": 67644,
+        "tool_calls": "",
+        "created_at": "2026-03-21 07:47:50.092582+00:00"
+      },
+      {
+        "id": "bf4d684f-6379-4462-a04f-971f3a2c7b9a",
+        "provider": "anthropic",
+        "model": "claude-opus-4-6",
+        "status": "success",
+        "latency": 5308.0,
+        "cost": 0.0488675,
+        "prompt_tokens": 68016,
+        "completion_tokens": 332,
+        "total_tokens": 68348,
+        "tool_calls": "",
+        "created_at": "2026-03-21 07:48:03.291131+00:00"
+      },
+      {
+        "id": "2927bb5c-a5a4-44b8-9001-70391e1560a8",
+        "provider": "anthropic",
+        "model": "claude-opus-4-6",
+        "status": "success",
+        "latency": 8893.0,
+        "cost": 0.05246625,
+        "prompt_tokens": 68625,
+        "completion_tokens": 586,
+        "total_tokens": 69211,
+        "tool_calls": "",
+        "created_at": "2026-03-21 07:48:08.658608+00:00"
+      },
+      {
+        "id": "c81592a0-1a9e-4064-b7d0-bab2f43bda10",
+        "provider": "anthropic",
+        "model": "claude-opus-4-6",
+        "status": "success",
+        "latency": 7507.0,
+        "cost": 0.054434750000000004,
+        "prompt_tokens": 69478,
+        "completion_tokens": 591,
+        "total_tokens": 70069,
+        "tool_calls": "",
+        "created_at": "2026-03-21 07:48:17.605956+00:00"
+      },
+      {
+        "id": "ac4cbd4e-d6b6-4c30-9da8-fcec3ac9998c",
+        "provider": "anthropic",
+        "model": "claude-opus-4-6",
+        "status": "success",
+        "latency": 7752.0,
+        "cost": 0.054881,
+        "prompt_tokens": 70416,
+        "completion_tokens": 571,
+        "total_tokens": 70987,
+        "tool_calls": "",
+        "created_at": "2026-03-21 07:48:25.172094+00:00"
+      },
+      {
+        "id": "72cdf532-70d9-4d2c-8bf5-31683f957338",
+        "provider": "anthropic",
+        "model": "claude-opus-4-6",
+        "status": "success",
+        "latency": 3773.0,
+        "cost": 0.04324375,
+        "prompt_tokens": 71297,
+        "completion_tokens": 101,
+        "total_tokens": 71398,
+        "tool_calls": "",
+        "created_at": "2026-03-21 07:48:33.300823+00:00"
+      },
+      {
+        "id": "d2843d9b-1ae7-463d-b744-53e30db8afbf",
+        "provider": "anthropic",
+        "model": "claude-opus-4-6",
+        "status": "success",
+        "latency": 324.0,
+        "cost": null,
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "total_tokens": 0,
+        "tool_calls": "",
+        "created_at": "2026-03-21 07:48:37.8491+00:00"
+      },
+      {
+        "id": "4dbc723b-0879-4952-b89b-626d7685b3e0",
+        "provider": "anthropic",
+        "model": "claude-opus-4-6",
+        "status": "success",
+        "latency": 7489.0,
+        "cost": 0.04435925,
+        "prompt_tokens": 71746,
+        "completion_tokens": 236,
+        "total_tokens": 71982,
+        "tool_calls": "",
+        "created_at": "2026-03-21 07:48:38.212837+00:00"
+      },
+      {
+        "id": "65591cc7-596e-4d0e-8298-912080173fc3",
+        "provider": "anthropic",
+        "model": "claude-opus-4-6",
+        "status": "success",
+        "latency": 9963.0,
+        "cost": 0.044452500000000006,
+        "prompt_tokens": 71994,
+        "completion_tokens": 281,
+        "total_tokens": 72275,
+        "tool_calls": "",
+        "created_at": "2026-03-21 07:48:45.766403+00:00"
+      }
+    ]
+  },
+  "business_case": {
+    "cost_per_design": 0.94,
+    "tool_to_llm_ratio": "11 tool calls -> 15 LLM requests",
+    "projected_monthly_cost_20_designers": 374.56,
+    "finding": "Each MCP tool call generates 1+ LLM requests. write_html is the most frequent (6 calls) and drives the majority of token spend. A single landing page design costs ~$0.94 in LLM spend, invisible without per-tool observability."
+  }
+}
